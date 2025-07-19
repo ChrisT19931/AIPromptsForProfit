@@ -12,7 +12,7 @@ export default function BuyButton({ className = '', size = 'md' }: BuyButtonProp
   const sizeClasses = {
     sm: 'px-4 py-2 text-sm',
     md: 'px-6 py-3 text-base',
-    lg: 'px-8 py-4 text-lg'
+    lg: 'px-10 py-5 text-lg'
   };
 
   return (
@@ -21,7 +21,7 @@ export default function BuyButton({ className = '', size = 'md' }: BuyButtonProp
         scale: 1.05,
         rotateY: 5,
         rotateX: 5,
-        boxShadow: "0 20px 40px -10px rgba(251, 191, 36, 0.4)"
+        boxShadow: "0 20px 40px -10px rgba(107, 114, 128, 0.5)"
       }}
       whileTap={{ 
         scale: 0.95,
@@ -52,7 +52,20 @@ export default function BuyButton({ className = '', size = 'md' }: BuyButtonProp
           whileHover={{ x: '200%' }}
           transition={{ duration: 0.6 }}
         />
-        <span className="relative z-10">Get All 30 Prompts - $10</span>
+        {/* Subtle pulsing glow effect */}
+        <motion.div 
+          className="absolute inset-0 bg-gradient-to-r from-gray-200/0 via-gray-200/30 to-gray-200/0 rounded-lg"
+          animate={{
+            opacity: [0.4, 0.7, 0.4],
+            scale: [0.98, 1.01, 0.98],
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        <span className="relative z-10 font-extrabold tracking-wide">Get All 30 Prompts - $10</span>
       </Link>
     </motion.div>
   );

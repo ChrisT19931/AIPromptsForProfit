@@ -96,8 +96,8 @@ export async function GET(request: NextRequest) {
 
   <div class="footer">
     <p><strong>Thank you for your purchase!</strong></p>
-    <p>For support, contact: <strong>chris.t@ventaroai.com</strong></p>
-    <p>© 2024 Ventaro AI - Australian-Made AI Solutions</p>
+    <p>For support, contact: <strong>chris.t@ventarosales.com</strong></p>
+    <p>© 2025 Ventaro AI - Australian-Made AI Solutions</p>
     <p>Visit us at: <strong>www.ventaroai.com</strong></p>
   </div>
 </body>

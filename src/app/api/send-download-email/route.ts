@@ -41,7 +41,7 @@ https://www.ventaroai.com/download
 
 🆘 NEED HELP?
 If you have any questions or need support:
-📧 Email: chris.t@ventaroai.com
+📧 Email: chris.t@ventarosales.com
 ⏰ Response time: Within 24 hours
 
 💰 START EARNING:
@@ -64,9 +64,9 @@ The Ventaro AI Team
 Ventaro AI
 Australian-Made AI Solutions
 Website: https://www.ventaroai.com
-Support: chris.t@ventaroai.com
+Support: chris.t@ventarosales.com
 
-© 2024 Ventaro AI. All rights reserved.
+© 2025 Ventaro AI. All rights reserved.
     `;
 
     // In a real implementation, you would use a service like:

@@ -72,19 +72,21 @@ export default function Footer() {
               transition={{ duration: 0.4, delay: 0.5 }}
               viewport={{ once: true }}
             >
-              <motion.p 
-                 className="text-gray-300 mb-2"
-                 whileHover={{ color: "#ffffff" }}
-               >
-                 Questions? We're here to help!
-               </motion.p>
-               <motion.a 
-                 href="mailto:chris.t@ventarosales.com" 
-                 className="text-white hover:underline"
-                 whileHover={{ scale: 1.05 }}
-               >
-                 chris.t@ventarosales.com
-               </motion.a>
+              <motion.div className="flex flex-col items-center">
+                 <motion.a 
+                   href="mailto:chris.t@ventarosales.com" 
+                   className="text-white hover:underline mb-1"
+                   whileHover={{ scale: 1.05 }}
+                 >
+                   chris.t@ventarosales.com
+                 </motion.a>
+                 <motion.p 
+                   className="text-gray-400 text-sm"
+                   whileHover={{ color: "#ffffff" }}
+                 >
+                   2025 Ventaro AI
+                 </motion.p>
+               </motion.div>
             </motion.div>
           </motion.div>
         </div>
