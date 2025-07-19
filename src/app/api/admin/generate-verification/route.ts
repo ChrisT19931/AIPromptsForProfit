@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { InputValidator } from '@/lib/validation';
-import { handleError } from '@/lib/error-handler';
-import { verifyAuth } from '@/lib/auth';
 import { rateLimit } from '@/lib/rate-limit';
-import { validateCSRFToken } from '@/lib/csrf';
 // Using Web Crypto API instead of Node.js crypto module
 
 export async function POST(request: NextRequest) {
@@ -15,7 +11,7 @@ export async function POST(request: NextRequest) {
     try {
       const response = new NextResponse();
       await rateLimiter.check(response, 5, `generate-verification-${ip}`);
-    } catch (error) {
+    } catch {
       return new NextResponse(
         JSON.stringify({ error: 'Too many requests' }),
         { status: 429, headers: { 'Content-Type': 'application/json' } }
@@ -99,11 +95,11 @@ export async function POST(request: NextRequest) {
     response.headers.set('X-Content-Type-Options', 'nosniff');
     return response;
 
-  } catch (error) {
-    console.error('Verification generation error:', error);
-    return new NextResponse(
-      JSON.stringify({ error: 'Failed to generate verification code' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+  } catch {
+    console.error('Verification generation error');
+    return NextResponse.json(
+      { error: 'Failed to generate verification code' },
+      { status: 500 }
     );
   }
 }

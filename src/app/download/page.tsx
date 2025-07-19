@@ -10,7 +10,7 @@ import { useSearchParams } from 'next/navigation';
 function DownloadContent() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [sessionValid, setSessionValid] = useState(false);
+  const [, setSessionValid] = useState(false);
   const searchParams = useSearchParams();
 
   useEffect(() => {

@@ -205,7 +205,7 @@ export default function DirectoriesPage() {
           { label: 'Approved', value: stats.approved, icon: '✅', color: 'bg-green-500' },
           { label: 'Submitted', value: stats.submitted, icon: '⏳', color: 'bg-yellow-500' },
           { label: 'Pending', value: stats.pending, icon: '📝', color: 'bg-gray-500' }
-        ].map((stat, index) => (
+        ].map((stat) => (
           <div key={stat.label} className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex items-center">
               <div className={`${stat.color} rounded-lg p-3 text-white text-xl mr-4`}>

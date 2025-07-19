@@ -2,8 +2,6 @@
 
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import Header from '../../../components/Header';
-import Footer from '../../../components/Footer';
 import Link from 'next/link';
 
 export default function Login() {

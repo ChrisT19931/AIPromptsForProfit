@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { InputValidator, CommonSchemas } from '@/lib/validation';
-import { SecureErrorHandler } from '@/lib/error-handler';
+import { InputValidator } from '@/lib/validation';
+import { SecureErrorHandler, ErrorType, ErrorSeverity } from '@/lib/error-handler';
 import { AuthMiddleware } from '@/lib/auth';
 import { rateLimit } from '@/lib/rate-limit';
 import { validateCSRFToken } from '@/lib/csrf';
@@ -17,68 +17,64 @@ interface Alert {
   metadata?: any;
 }
 
-interface AlertRule {
-  id: string;
-  type: string;
-  enabled: boolean;
-  conditions: {
-    metric: string;
-    operator: 'gt' | 'lt' | 'eq' | 'gte' | 'lte';
-    value: number;
-    timeframe: string;
-  }[];
-  notifications: {
-    email: boolean;
-    slack: boolean;
-    discord: boolean;
-    webhook?: string;
-  };
-  cooldown: number; // minutes
-}
+// interface AlertRule {
+//   id: string;
+//   type: string;
+//   enabled: boolean;
+//   conditions: {
+//     metric: string;
+//     operator: 'gt' | 'lt' | 'eq' | 'gte' | 'lte';
+//     value: number;
+//     timeframe: string;
+//   }[];
+//   notifications: {
+//     email: boolean;
+//     slack: boolean;
+//     discord: boolean;
+//     webhook?: string;
+//   };
+//   cooldown: number; // minutes
+// }
 
 // GET endpoint to fetch alerts
 export async function GET(request: NextRequest) {
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimit(request, {
-      maxRequests: 50,
-      windowMs: 60 * 1000, // 1 minute
-      keyGenerator: (req) => `alerts-${req.ip || 'unknown'}`
-    });
+    const ip = request.headers.get('x-forwarded-for') || 'unknown';
+    const rateLimiter = rateLimit({ interval: 60000, uniqueTokenPerInterval: 100 });
     
-    if (!rateLimitResult.success) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('RATE_LIMIT', 'Too many requests'),
-        request
+    try {
+      const response = new NextResponse();
+      await rateLimiter.check(response, 50, `alerts-${ip}`);
+    } catch {
+      return SecureErrorHandler.createErrorResponse(
+        SecureErrorHandler.handleError(new Error('Too many requests'), ErrorType.RATE_LIMIT)
       );
     }
 
     // Authentication and authorization
     const authResult = await AuthMiddleware.requireAuth(request);
     if (!authResult.success) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('AUTH', authResult.error || 'Authentication required'),
-        request
+      return SecureErrorHandler.createErrorResponse(
+        SecureErrorHandler.handleError(new Error(authResult.error || 'Authentication required'), ErrorType.AUTHENTICATION)
       );
     }
 
     const hasPermission = await AuthMiddleware.checkPermission(authResult.user!, 'admin:read');
     if (!hasPermission) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('AUTH', 'Insufficient permissions'),
-        request
+      return SecureErrorHandler.createErrorResponse(
+        SecureErrorHandler.handleError(new Error('Insufficient permissions'), ErrorType.AUTHORIZATION)
       );
     }
 
     const { searchParams } = new URL(request.url);
     
     // Input validation and sanitization
-    const validator = new InputValidator();
     const querySchema = {
-      limit: { type: 'number', min: 1, max: 100, optional: true },
-      unread: { type: 'string', enum: ['true', 'false'], optional: true },
-      severity: { type: 'string', enum: ['low', 'medium', 'high', 'critical'], optional: true },
-      type: { type: 'string', enum: ['traffic_spike', 'new_backlink', 'seo_error', 'performance', 'security'], optional: true }
+      limit: { type: 'number' as const, required: false },
+      unread: { type: 'string' as const, required: false, allowedValues: ['true', 'false'] },
+      severity: { type: 'string' as const, required: false, allowedValues: ['low', 'medium', 'high', 'critical'] },
+      type: { type: 'string' as const, required: false, allowedValues: ['traffic_spike', 'new_backlink', 'seo_error', 'performance', 'security'] }
     };
 
     const queryData = {
@@ -88,15 +84,14 @@ export async function GET(request: NextRequest) {
       type: searchParams.get('type')
     };
 
-    const validationResult = validator.validate(queryData, querySchema);
+    const validationResult = InputValidator.validate(queryData, querySchema);
     if (!validationResult.isValid) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('VALIDATION', 'Invalid query parameters', validationResult.errors),
-        request
+      return SecureErrorHandler.createErrorResponse(
+        SecureErrorHandler.handleError(new Error('Invalid query parameters'), ErrorType.VALIDATION, ErrorSeverity.LOW, { errors: validationResult.errors })
       );
     }
 
-    const sanitizedData = validator.sanitize(validationResult.data);
+    const sanitizedData = validationResult.sanitizedData;
     const limit = sanitizedData.limit || 50;
     const unreadOnly = sanitizedData.unread === 'true';
     const severity = sanitizedData.severity;
@@ -244,10 +239,9 @@ export async function GET(request: NextRequest) {
     
     return response;
 
-  } catch (error) {
-    return SecureErrorHandler.createResponse(
-      SecureErrorHandler.createError('INTERNAL', 'Failed to fetch alerts', error),
-      request
+  } catch {
+    return SecureErrorHandler.createErrorResponse(
+      SecureErrorHandler.handleError(new Error('Failed to fetch alerts'), ErrorType.INTERNAL)
     );
   }
 }
@@ -256,42 +250,39 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimit(request, {
-      maxRequests: 10,
-      windowMs: 60 * 1000, // 1 minute
-      keyGenerator: (req) => `alerts-post-${req.ip || 'unknown'}`
-    });
+    const ip = request.headers.get('x-forwarded-for') || 'unknown';
+    const rateLimiter = rateLimit({ interval: 60000, uniqueTokenPerInterval: 100 });
     
-    if (!rateLimitResult.success) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('RATE_LIMIT', 'Too many requests'),
-        request
+    try {
+      const response = new NextResponse();
+      await rateLimiter.check(response, 10, `alerts-post-${ip}`);
+    } catch {
+      return SecureErrorHandler.createErrorResponse(
+        SecureErrorHandler.handleError(new Error('Too many requests'), ErrorType.RATE_LIMIT)
       );
     }
 
     // Authentication and authorization
     const authResult = await AuthMiddleware.requireAuth(request);
     if (!authResult.success) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('AUTH', authResult.error || 'Authentication required'),
-        request
+      return SecureErrorHandler.createErrorResponse(
+        SecureErrorHandler.handleError(new Error(authResult.error || 'Authentication required'), ErrorType.AUTHENTICATION)
       );
     }
 
     const hasPermission = await AuthMiddleware.checkPermission(authResult.user!, 'admin:write');
     if (!hasPermission) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('AUTH', 'Insufficient permissions'),
-        request
+      return SecureErrorHandler.createErrorResponse(
+        SecureErrorHandler.handleError(new Error('Insufficient permissions'), ErrorType.AUTHORIZATION)
       );
     }
 
     // CSRF validation
-    const csrfResult = await validateCSRFToken(request);
-    if (!csrfResult.valid) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('CSRF', 'Invalid CSRF token'),
-        request
+    const csrfToken = request.headers.get('x-csrf-token');
+    const csrfValid = await validateCSRFToken(csrfToken);
+    if (!csrfValid) {
+      return SecureErrorHandler.createErrorResponse(
+        SecureErrorHandler.handleError(new Error('Invalid CSRF token'), ErrorType.VALIDATION)
       );
     }
 
@@ -299,33 +290,30 @@ export async function POST(request: NextRequest) {
     const { action, ...data } = body;
 
     // Input validation
-    const validator = new InputValidator();
     if (!action || typeof action !== 'string') {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('VALIDATION', 'Action is required'),
-        request
+      return SecureErrorHandler.createErrorResponse(
+        SecureErrorHandler.handleError(new Error('Action is required'), ErrorType.VALIDATION)
       );
     }
 
     switch (action) {
       case 'create':
         const createSchema = {
-          type: { type: 'string', required: true, enum: ['traffic_spike', 'new_backlink', 'seo_error', 'performance', 'security'] },
-          severity: { type: 'string', required: true, enum: ['low', 'medium', 'high', 'critical'] },
-          title: { type: 'string', required: true, minLength: 1, maxLength: 200 },
-          message: { type: 'string', required: true, minLength: 1, maxLength: 1000 },
-          metadata: { type: 'object', optional: true }
+          type: { type: 'string' as const, required: true, allowedValues: ['traffic_spike', 'new_backlink', 'seo_error', 'performance', 'security'] },
+          severity: { type: 'string' as const, required: true, allowedValues: ['low', 'medium', 'high', 'critical'] },
+          title: { type: 'string' as const, required: true, minLength: 1, maxLength: 200 },
+          message: { type: 'string' as const, required: true, minLength: 1, maxLength: 1000 },
+          metadata: { type: 'object' as const, required: false }
         };
 
-        const createValidation = validator.validate(data, createSchema);
+        const createValidation = InputValidator.validate(data, createSchema);
         if (!createValidation.isValid) {
-          return SecureErrorHandler.createResponse(
-            SecureErrorHandler.createError('VALIDATION', 'Invalid alert data', createValidation.errors),
-            request
+          return SecureErrorHandler.createErrorResponse(
+            SecureErrorHandler.handleError(new Error('Invalid alert data'), ErrorType.VALIDATION, ErrorSeverity.LOW, { errors: createValidation.errors })
           );
         }
 
-        const sanitizedCreate = validator.sanitize(createValidation.data);
+        const sanitizedCreate = createValidation.sanitizedData;
         const { type, severity, title, message, metadata } = sanitizedCreate;
 
         const newAlert: Alert = {
@@ -370,18 +358,17 @@ export async function POST(request: NextRequest) {
 
       case 'test_notification':
         const testSchema = {
-          notificationType: { type: 'string', required: true, enum: ['email', 'slack', 'discord'] }
+          notificationType: { type: 'string' as const, required: true, allowedValues: ['email', 'slack', 'discord'] }
         };
 
-        const testValidation = validator.validate(data, testSchema);
+        const testValidation = InputValidator.validate(data, testSchema);
         if (!testValidation.isValid) {
-          return SecureErrorHandler.createResponse(
-            SecureErrorHandler.createError('VALIDATION', 'Invalid notification type', testValidation.errors),
-            request
+          return SecureErrorHandler.createErrorResponse(
+            SecureErrorHandler.handleError(new Error('Invalid notification type'), ErrorType.VALIDATION, ErrorSeverity.LOW, { errors: testValidation.errors })
           );
         }
 
-        const sanitizedTest = validator.sanitize(testValidation.data);
+        const sanitizedTest = testValidation.sanitizedData;
         const { notificationType } = sanitizedTest;
         
         const testAlert: Alert = {
@@ -405,16 +392,14 @@ export async function POST(request: NextRequest) {
         return testResponse;
 
       default:
-        return SecureErrorHandler.createResponse(
-          SecureErrorHandler.createError('VALIDATION', 'Invalid action'),
-          request
+        return SecureErrorHandler.createErrorResponse(
+          SecureErrorHandler.handleError(new Error('Invalid action'), ErrorType.VALIDATION)
         );
     }
 
-  } catch (error) {
-    return SecureErrorHandler.createResponse(
-      SecureErrorHandler.createError('INTERNAL', 'Failed to process alert request', error),
-      request
+  } catch {
+    return SecureErrorHandler.createErrorResponse(
+      SecureErrorHandler.handleError(new Error('Failed to process alert request'), ErrorType.INTERNAL)
     );
   }
 }
@@ -423,73 +408,67 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimit(request, {
-      maxRequests: 20,
-      windowMs: 60 * 1000, // 1 minute
-      keyGenerator: (req) => `alerts-put-${req.ip || 'unknown'}`
-    });
+    const ip = request.headers.get('x-forwarded-for') || 'unknown';
+    const rateLimiter = rateLimit({ interval: 60000, uniqueTokenPerInterval: 100 });
     
-    if (!rateLimitResult.success) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('RATE_LIMIT', 'Too many requests'),
-        request
+    try {
+      const response = new NextResponse();
+      await rateLimiter.check(response, 20, `alerts-put-${ip}`);
+    } catch {
+      return SecureErrorHandler.createErrorResponse(
+        SecureErrorHandler.handleError(new Error('Too many requests'), ErrorType.RATE_LIMIT)
       );
     }
 
     // Authentication and authorization
     const authResult = await AuthMiddleware.requireAuth(request);
     if (!authResult.success) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('AUTH', authResult.error || 'Authentication required'),
-        request
+      return SecureErrorHandler.createErrorResponse(
+        SecureErrorHandler.handleError(new Error(authResult.error || 'Authentication required'), ErrorType.AUTHENTICATION)
       );
     }
 
     const hasPermission = await AuthMiddleware.checkPermission(authResult.user!, 'admin:write');
     if (!hasPermission) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('AUTH', 'Insufficient permissions'),
-        request
+      return SecureErrorHandler.createErrorResponse(
+        SecureErrorHandler.handleError(new Error('Insufficient permissions'), ErrorType.AUTHORIZATION)
       );
     }
 
     // CSRF validation
-    const csrfResult = await validateCSRFToken(request);
-    if (!csrfResult.valid) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('CSRF', 'Invalid CSRF token'),
-        request
-      );
-    }
+  const csrfToken = request.headers.get('x-csrf-token');
+  const csrfValid = await validateCSRFToken(csrfToken);
+  if (!csrfValid) {
+    return SecureErrorHandler.createErrorResponse(
+      SecureErrorHandler.handleError(new Error('Invalid CSRF token'), ErrorType.VALIDATION)
+    );
+  }
 
     const body = await request.json();
     const { alertIds, action } = body;
     
     // Input validation
-    const validator = new InputValidator();
     const updateSchema = {
-      alertIds: { type: 'array', required: true, minLength: 1, maxLength: 100 },
-      action: { type: 'string', required: true, enum: ['mark_read', 'mark_unread', 'delete'] }
+      alertIds: { type: 'array' as const, required: true },
+      action: { type: 'string' as const, required: true, allowedValues: ['mark_read', 'mark_unread', 'delete'] }
     };
 
-    const validationResult = validator.validate({ alertIds, action }, updateSchema);
+    const validationResult = InputValidator.validate({ alertIds, action }, updateSchema);
     if (!validationResult.isValid) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('VALIDATION', 'Invalid update data', validationResult.errors),
-        request
+      return SecureErrorHandler.createErrorResponse(
+        SecureErrorHandler.handleError(new Error('Invalid update data'), ErrorType.VALIDATION, ErrorSeverity.LOW, { errors: validationResult.errors })
       );
     }
 
-    const sanitizedData = validator.sanitize(validationResult.data);
+    const sanitizedData = validationResult.sanitizedData;
     const sanitizedAlertIds = sanitizedData.alertIds;
     const sanitizedAction = sanitizedData.action;
 
     // Validate each alert ID
     for (const id of sanitizedAlertIds) {
       if (typeof id !== 'string' || id.length === 0) {
-        return SecureErrorHandler.createResponse(
-          SecureErrorHandler.createError('VALIDATION', 'Invalid alert ID in array'),
-          request
+        return SecureErrorHandler.createErrorResponse(
+          SecureErrorHandler.handleError(new Error('Invalid alert ID in array'), ErrorType.VALIDATION)
         );
       }
     }
@@ -532,16 +511,14 @@ export async function PUT(request: NextRequest) {
         return deleteResponse;
 
       default:
-        return SecureErrorHandler.createResponse(
-          SecureErrorHandler.createError('VALIDATION', 'Invalid action'),
-          request
+        return SecureErrorHandler.createErrorResponse(
+          SecureErrorHandler.handleError(new Error('Invalid action'), ErrorType.VALIDATION)
         );
     }
 
-  } catch (error) {
-    return SecureErrorHandler.createResponse(
-      SecureErrorHandler.createError('INTERNAL', 'Failed to update alerts', error),
-      request
+  } catch {
+    return SecureErrorHandler.createErrorResponse(
+      SecureErrorHandler.handleError(new Error('Failed to update alerts'), ErrorType.INTERNAL)
     );
   }
 }
@@ -574,8 +551,8 @@ async function sendNotifications(alert: Alert, specificType?: string) {
     
     await Promise.all(notifications);
     
-  } catch (error) {
-    console.error('Notification sending error:', error);
+  } catch {
+    console.error('Notification sending error');
   }
 }
 

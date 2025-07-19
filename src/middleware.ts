@@ -59,7 +59,7 @@ export async function middleware(request: NextRequest) {
       }
 
       await limiter.check(response, limit, ip + pathname);
-    } catch (error) {
+    } catch {
       return new NextResponse(
         JSON.stringify({ 
           error: 'Rate limit exceeded. Please try again later.',
@@ -102,8 +102,8 @@ export async function middleware(request: NextRequest) {
             }
           );
         }
-      } catch (error) {
-        console.error('CSRF validation error:', error);
+      } catch {
+        console.error('CSRF validation error');
         return new NextResponse(
           JSON.stringify({ 
             error: 'CSRF validation failed',
@@ -139,7 +139,7 @@ export async function middleware(request: NextRequest) {
         response.cookies.delete('admin-token');
         return response;
       }
-    } catch (error) {
+    } catch {
       const response = NextResponse.redirect(new URL('/login?error=invalid_token', request.url));
       response.cookies.delete('admin-token');
       return response;
@@ -185,8 +185,8 @@ async function validateAdminToken(token: string): Promise<boolean> {
     
     // Simulate token validation
     return token.startsWith('admin_') && token.length > 20;
-  } catch (error) {
-    console.error('Token validation error:', error);
+  } catch {
+    console.error('Token validation error');
     return false;
   }
 }

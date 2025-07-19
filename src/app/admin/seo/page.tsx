@@ -145,7 +145,7 @@ export default function SEOTools() {
           </button>
           {verificationCode && (
             <div className="bg-gray-50 rounded-lg p-4">
-              <p className="text-sm text-gray-600 mb-2">Copy this meta tag to your site's &lt;head&gt; section:</p>
+              <p className="text-sm text-gray-600 mb-2">Copy this meta tag to your site&apos;s &lt;head&gt; section:</p>
               <div className="bg-white border rounded p-3 font-mono text-sm break-all">
                 {verificationCode}
               </div>
@@ -170,8 +170,8 @@ export default function SEOTools() {
         <h2 className="text-xl font-bold text-gray-900 mb-4">📋 SEO Checklist</h2>
         <div className="space-y-4">
           {seoChecklist.map((item, index) => (
-            <motion.div
-              key={index}
+                  <motion.div
+                    key={index}
               className="flex items-start space-x-3 p-4 border rounded-lg"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}

@@ -62,7 +62,7 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
   let body;
   try {
     body = await request.json();
-  } catch (error) {
+  } catch {
     const errorDetails = SecureErrorHandler.handleError(
       new Error('Invalid JSON payload'),
       ErrorType.VALIDATION,
@@ -106,14 +106,15 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
   }
 
   const sitemapUrl = `${baseUrl}/sitemap.xml`;
-  let submissionUrl = '';
 
   switch (searchEngine) {
     case 'google':
-      submissionUrl = `https://www.google.com/ping?sitemap=${encodeURIComponent(sitemapUrl)}`;
+      // Google submission URL
+      await submitToGoogle(sitemapUrl);
       break;
     case 'bing':
-      submissionUrl = `https://www.bing.com/ping?sitemap=${encodeURIComponent(sitemapUrl)}`;
+      // Bing submission URL
+      await submitToBing(sitemapUrl);
       break;
   }
 

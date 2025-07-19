@@ -191,7 +191,7 @@ chris.t@ventarosales.com`);
             { label: 'Email Template', content: shareSnippets.email, icon: '📧' },
             { label: 'Twitter Post', content: shareSnippets.twitter, icon: '🐦' },
             { label: 'LinkedIn Post', content: shareSnippets.linkedin, icon: '💼' },
-          ].map((snippet, index) => (
+          ].map((snippet) => (
             <div key={snippet.label} className="border rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-semibold text-gray-900 flex items-center">
@@ -291,7 +291,7 @@ chris.t@ventarosales.com`);
             { label: 'Share on LinkedIn', url: `https://www.linkedin.com/sharing/share-offsite/?url=https://ventaroai.com`, icon: '💼', color: 'bg-blue-600' },
             { label: 'Submit to Reddit', url: 'https://www.reddit.com/submit?url=https://ventaroai.com&title=Ventaro AI - Premium AI Prompts for Profit', icon: '🔴', color: 'bg-orange-500' },
             { label: 'Email a Friend', url: `mailto:?subject=Check out Ventaro AI&body=${encodeURIComponent(shareSnippets.email)}`, icon: '📧', color: 'bg-green-500' },
-          ].map((action, index) => (
+          ].map((action) => (
             <a
               key={action.label}
               href={action.url}

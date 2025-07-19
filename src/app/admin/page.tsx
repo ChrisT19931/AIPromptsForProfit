@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import Link from 'next/link';
+// Link import removed as it's no longer used
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
@@ -13,7 +13,7 @@ export default function AdminDashboard() {
     seoScore: 0,
   });
 
-  const [recentActivity, setRecentActivity] = useState([
+  const [recentActivity] = useState([
     { type: 'sale', message: 'New purchase completed', time: '2 hours ago' },
     { type: 'backlink', message: 'New backlink detected from example.com', time: '4 hours ago' },
     { type: 'outreach', message: 'Outreach campaign completed (15 sites)', time: '1 day ago' },

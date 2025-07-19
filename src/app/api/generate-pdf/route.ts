@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { allPrompts } from '../../../../data/prompts';
 
-export async function GET(request: NextRequest) {
+export async function POST() {
   try {
     // Create PDF content as HTML that can be converted to PDF
     const htmlContent = `

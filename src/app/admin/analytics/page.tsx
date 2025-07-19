@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 
 interface AnalyticsData {
@@ -50,7 +50,7 @@ const mockAnalyticsData: AnalyticsData = {
 };
 
 export default function AnalyticsPage() {
-  const [analyticsData, setAnalyticsData] = useState<AnalyticsData>(mockAnalyticsData);
+  const [analyticsData] = useState<AnalyticsData>(mockAnalyticsData);
   const [selectedTimeRange, setSelectedTimeRange] = useState('7d');
   const [isConnected, setIsConnected] = useState({
     googleAnalytics: true,
@@ -161,7 +161,7 @@ export default function AnalyticsPage() {
           { label: 'Unique Visitors', value: analyticsData.uniqueVisitors.toLocaleString(), icon: '👥', color: 'bg-green-500', change: '+8.3%' },
           { label: 'Bounce Rate', value: `${analyticsData.bounceRate}%`, icon: '⚡', color: 'bg-orange-500', change: '-2.1%' },
           { label: 'Avg Session', value: analyticsData.avgSessionDuration, icon: '⏱️', color: 'bg-purple-500', change: '+15.2%' }
-        ].map((metric, index) => (
+        ].map((metric) => (
           <div key={metric.label} className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex items-center justify-between mb-2">
               <div className={`${metric.color} rounded-lg p-3 text-white text-xl`}>
@@ -221,7 +221,7 @@ export default function AnalyticsPage() {
         >
           <h2 className="text-xl font-bold text-gray-900 mb-4">🚀 Traffic Sources</h2>
           <div className="space-y-3">
-            {analyticsData.trafficSources.map((source, index) => (
+            {analyticsData.trafficSources.map((source) => (
               <div key={source.source} className="flex items-center justify-between">
                 <div className="flex items-center">
                   <div className={`w-4 h-4 ${source.color} rounded-full mr-3`}></div>
@@ -272,7 +272,7 @@ export default function AnalyticsPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {analyticsData.searchQueries.map((query, index) => (
+              {analyticsData.searchQueries.map((query) => (
                 <tr key={query.query} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {query.query}

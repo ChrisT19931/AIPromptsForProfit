@@ -8,7 +8,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'change-this-in-production-very-lon
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'change-this-refresh-secret-in-production';
 const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH;
 const SESSION_DURATION = 24 * 60 * 60 * 1000; // 24 hours
-const REFRESH_TOKEN_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days
+// const REFRESH_TOKEN_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 interface User {
   id: string;
@@ -344,56 +344,50 @@ export class AuthMiddleware {
   /**
    * Require authentication
    */
-  static requireAuth(requiredRole?: string, requiredPermissions?: string[]) {
-    return async (request: NextRequest): Promise<NextResponse | null> => {
+  static async requireAuth(request: NextRequest): Promise<{
+    success: boolean;
+    user?: User;
+    error?: string;
+  }> {
+    try {
       const authHeader = request.headers.get('authorization');
       const token = TokenManager.extractTokenFromHeader(authHeader);
 
       if (!token) {
-        return new NextResponse(
-          JSON.stringify({ error: 'Authentication required' }),
-          { status: 401, headers: { 'Content-Type': 'application/json' } }
-        );
+        return { success: false, error: 'Authentication required' };
       }
 
       const session = SessionManager.validateSession(token);
       if (!session) {
-        return new NextResponse(
-          JSON.stringify({ error: 'Invalid or expired session' }),
-          { status: 401, headers: { 'Content-Type': 'application/json' } }
-        );
+        return { success: false, error: 'Invalid or expired session' };
       }
 
-      // Check role
-      if (requiredRole && session.role !== requiredRole) {
-        return new NextResponse(
-          JSON.stringify({ error: 'Insufficient permissions' }),
-          { status: 403, headers: { 'Content-Type': 'application/json' } }
-        );
-      }
+      const user: User = {
+        id: session.userId,
+        username: session.username,
+        role: session.role as 'admin' | 'user',
+        permissions: session.permissions
+      };
 
-      // Check permissions
-      if (requiredPermissions) {
-        const hasPermissions = requiredPermissions.every(permission => 
-          session.permissions.includes(permission)
-        );
-        
-        if (!hasPermissions) {
-          return new NextResponse(
-            JSON.stringify({ error: 'Insufficient permissions' }),
-            { status: 403, headers: { 'Content-Type': 'application/json' } }
-          );
-        }
-      }
+      return { success: true, user };
+    } catch (error) {
+      console.error('Authentication error:', error);
+      return { success: false, error: 'Authentication failed' };
+    }
+  }
 
-      // Add user data to request headers for downstream use
-      const response = NextResponse.next();
-      response.headers.set('x-user-id', session.userId);
-      response.headers.set('x-user-role', session.role);
-      response.headers.set('x-session-id', session.sessionId);
+  /**
+   * Check if user has specific permission
+   */
+  static hasPermission(user: User, permission: string): boolean {
+    return user.permissions.includes(permission);
+  }
 
-      return null; // Continue to next middleware/handler
-    };
+  /**
+   * Check if user has specific permission (async version)
+   */
+  static async checkPermission(user: User, permission: string): Promise<boolean> {
+    return user.permissions.includes(permission);
   }
 
   /**

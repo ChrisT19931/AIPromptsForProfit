@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { validateInput } from '@/lib/validation';
-import { handleError } from '@/lib/error-handler';
-import { verifyAuth } from '@/lib/auth';
 import { rateLimit } from '@/lib/rate-limit';
-import { validateCSRF } from '@/lib/csrf';
 
 interface AnalyticsData {
   pageViews: number;
@@ -45,7 +41,7 @@ export async function GET(request: NextRequest) {
     try {
       const response = new NextResponse();
       await rateLimiter.check(response, 100, `analytics-${ip}`);
-    } catch (error) {
+    } catch {
       return new NextResponse(
         JSON.stringify({ error: 'Too many requests' }),
         { status: 429, headers: { 'Content-Type': 'application/json' } }
@@ -182,6 +178,7 @@ export async function GET(request: NextRequest) {
     let responseData: any = analyticsData;
     
     if (service === 'ga') {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { searchConsoleData, ...gaOnly } = analyticsData;
       responseData = gaOnly;
     } else if (service === 'gsc') {
@@ -200,8 +197,8 @@ export async function GET(request: NextRequest) {
     response.headers.set('X-Content-Type-Options', 'nosniff');
     return response;
 
-  } catch (error) {
-    console.error('Analytics fetch error:', error);
+  } catch {
+    console.error('Analytics fetch error');
     return new NextResponse(
       JSON.stringify({ error: 'Failed to fetch analytics data' }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
@@ -219,7 +216,7 @@ export async function POST(request: NextRequest) {
     try {
       const response = new NextResponse();
       await rateLimiter.check(response, 10, `analytics-post-${ip}`);
-    } catch (error) {
+    } catch {
       return new NextResponse(
         JSON.stringify({ error: 'Too many requests' }),
         { status: 429, headers: { 'Content-Type': 'application/json' } }
@@ -355,8 +352,8 @@ export async function POST(request: NextRequest) {
         );
     }
 
-  } catch (error) {
-    console.error('Analytics configuration error:', error);
+  } catch {
+    console.error('Analytics configuration error');
     return new NextResponse(
       JSON.stringify({ error: 'Failed to configure analytics' }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
@@ -374,7 +371,7 @@ export async function PUT(request: NextRequest) {
     try {
       const response = new NextResponse();
       await rateLimiter.check(response, 15, `analytics-put-${ip}`);
-    } catch (error) {
+    } catch {
       return new NextResponse(
         JSON.stringify({ error: 'Too many requests' }),
         { status: 429, headers: { 'Content-Type': 'application/json' } }
@@ -420,8 +417,8 @@ export async function PUT(request: NextRequest) {
     response.headers.set('X-Content-Type-Options', 'nosniff');
     return response;
 
-  } catch (error) {
-    console.error('Analytics settings update error:', error);
+  } catch {
+    console.error('Analytics settings update error');
     return new NextResponse(
       JSON.stringify({ error: 'Failed to update analytics settings' }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }

@@ -229,9 +229,9 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
       }
     });
 
-  } catch (error) {
+  } catch {
     const errorDetails = SecureErrorHandler.handleError(
-      error as Error,
+      new Error('SEO health check failed'),
       ErrorType.INTERNAL,
       ErrorSeverity.HIGH
     );
@@ -288,7 +288,7 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
   let body;
   try {
     body = await request.json();
-  } catch (error) {
+  } catch {
     const errorDetails = SecureErrorHandler.handleError(
       new Error('Invalid JSON payload'),
       ErrorType.VALIDATION,
@@ -360,9 +360,9 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
       }
     });
 
-  } catch (error) {
+  } catch {
     const errorDetails = SecureErrorHandler.handleError(
-      error as Error,
+      new Error('SEO audit failed'),
       ErrorType.INTERNAL,
       ErrorSeverity.HIGH,
       { url }

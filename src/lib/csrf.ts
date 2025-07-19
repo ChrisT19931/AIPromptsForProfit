@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+// NextRequest import removed as it's no longer used
 // Using Web Crypto API instead of Node.js crypto module for Edge Runtime compatibility
 
 // CSRF token configuration
@@ -69,8 +69,7 @@ export async function generateCSRFToken(sessionId?: string): Promise<string> {
  * Validate CSRF token
  */
 export async function validateCSRFToken(
-  token: string | null,
-  request: NextRequest
+  token: string | null
 ): Promise<boolean> {
   if (!token) {
     return false;
@@ -126,8 +125,8 @@ export async function validateCSRFToken(
     }
 
     // Additional validation: check session consistency if available
-    const userAgent = request.headers.get('user-agent') || '';
-    const ip = request.headers.get('x-forwarded-for') || '';
+    // const userAgent = request.headers.get('user-agent') || '';
+    // const ip = request.headers.get('x-forwarded-for') || '';
     
     // Optional: Validate against session fingerprint
     if (sessionId && storedToken.sessionId !== sessionId) {
@@ -138,8 +137,8 @@ export async function validateCSRFToken(
     tokenStore.delete(token);
     return true;
     
-  } catch (error) {
-    console.error('CSRF token validation error:', error);
+  } catch {
+    console.error('CSRF token validation error');
     return false;
   }
 }
@@ -260,7 +259,7 @@ export class DoubleSubmitCSRF {
       }
       
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   }

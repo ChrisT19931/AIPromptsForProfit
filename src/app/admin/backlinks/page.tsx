@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 
 interface Backlink {
@@ -155,7 +155,7 @@ export default function BacklinksPage() {
       
       setBacklinks(prev => [newBacklink, ...prev]);
       alert('Backlink scan completed! Found 1 new backlink.');
-    } catch (error) {
+    } catch {
       alert('Backlink scan failed. Please try again.');
     } finally {
       setIsScanning(false);
@@ -168,7 +168,7 @@ export default function BacklinksPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Backlink Monitoring</h1>
-          <p className="text-gray-600 mt-2">Track and analyze your website's backlink profile</p>
+          <p className="text-gray-600 mt-2">Track and analyze your website&apos;s backlink profile</p>
         </div>
         <button
           onClick={handleScanBacklinks}
@@ -198,7 +198,7 @@ export default function BacklinksPage() {
           { label: 'Dofollow', value: stats.dofollow, icon: '🎯', color: 'bg-purple-500' },
           { label: 'Avg DA', value: stats.avgDA, icon: '📊', color: 'bg-orange-500' },
           { label: 'Traffic', value: stats.totalTraffic, icon: '👥', color: 'bg-indigo-500' }
-        ].map((stat, index) => (
+        ].map((stat) => (
           <div key={stat.label} className="bg-white rounded-lg shadow-sm p-4">
             <div className="flex items-center">
               <div className={`${stat.color} rounded-lg p-2 text-white text-lg mr-3`}>

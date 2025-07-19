@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { InputValidator, CommonSchemas } from '@/lib/validation';
-import { SecureErrorHandler } from '@/lib/error-handler';
+import { InputValidator } from '@/lib/validation';
+import { SecureErrorHandler, ErrorType } from '@/lib/error-handler';
 import { AuthMiddleware } from '@/lib/auth';
 import { rateLimit } from '@/lib/rate-limit';
 import { validateCSRFToken } from '@/lib/csrf';
@@ -278,47 +278,43 @@ const directories: Directory[] = [
 export async function GET(request: NextRequest) {
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimit(request, {
-      maxRequests: 30,
-      windowMs: 60 * 1000, // 1 minute
-      keyGenerator: (req) => `directories-${req.ip || 'unknown'}`
-    });
+    const ip = request.headers.get('x-forwarded-for') || 'unknown';
+    const rateLimiter = rateLimit({ interval: 60000, uniqueTokenPerInterval: 100 });
+    const rateLimitResponse = NextResponse.next();
     
-    if (!rateLimitResult.success) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('RATE_LIMIT', 'Too many requests'),
-        request
+    try {
+      await rateLimiter.check(rateLimitResponse, 30, `directories-${ip}`);
+    } catch {
+      return SecureErrorHandler.createErrorResponse(
+        SecureErrorHandler.handleError(new Error('Rate limit exceeded'), ErrorType.RATE_LIMIT)
       );
     }
 
     // Authentication and authorization
     const authResult = await AuthMiddleware.requireAuth(request);
     if (!authResult.success) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('AUTH', authResult.error || 'Authentication required'),
-        request
+      return SecureErrorHandler.createErrorResponse(
+        SecureErrorHandler.handleError(new Error(authResult.error || 'Authentication required'), ErrorType.AUTHENTICATION)
       );
     }
 
     const hasPermission = await AuthMiddleware.checkPermission(authResult.user!, 'admin:read');
     if (!hasPermission) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('AUTH', 'Insufficient permissions'),
-        request
+      return SecureErrorHandler.createErrorResponse(
+        SecureErrorHandler.handleError(new Error('Insufficient permissions'), ErrorType.AUTHORIZATION)
       );
     }
 
     const { searchParams } = new URL(request.url);
     
     // Input validation and sanitization
-    const validator = new InputValidator();
     const querySchema = {
-      category: { type: 'string', enum: ['product_launch', 'startup_community', 'software_directory', 'tech_news', 'business_listing', 'ai_tools', 'general'], optional: true },
-      status: { type: 'string', enum: ['not_submitted', 'submitted', 'approved', 'rejected', 'pending'], optional: true },
-      priority: { type: 'string', enum: ['low', 'medium', 'high'], optional: true },
-      search: { type: 'string', maxLength: 100, optional: true },
-      limit: { type: 'number', min: 1, max: 100, optional: true },
-      offset: { type: 'number', min: 0, optional: true }
+      category: { type: 'string' as const, required: false, allowedValues: ['product_launch', 'startup_community', 'software_directory', 'tech_news', 'business_listing', 'ai_tools', 'general'] },
+      status: { type: 'string' as const, required: false, allowedValues: ['not_submitted', 'submitted', 'approved', 'rejected', 'pending'] },
+      priority: { type: 'string' as const, required: false, allowedValues: ['low', 'medium', 'high'] },
+      search: { type: 'string' as const, required: false, maxLength: 100 },
+      limit: { type: 'number' as const, required: false },
+      offset: { type: 'number' as const, required: false }
     };
 
     const queryData = {
@@ -330,15 +326,14 @@ export async function GET(request: NextRequest) {
       offset: searchParams.get('offset') ? parseInt(searchParams.get('offset')!) : undefined
     };
 
-    const validationResult = validator.validate(queryData, querySchema);
+    const validationResult = InputValidator.validate(queryData, querySchema);
     if (!validationResult.isValid) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('VALIDATION', 'Invalid query parameters', validationResult.errors),
-        request
+      return SecureErrorHandler.createErrorResponse(
+        SecureErrorHandler.handleError(new Error('Invalid query parameters'), ErrorType.VALIDATION)
       );
     }
 
-    const sanitizedData = validator.sanitize(validationResult.data);
+    const sanitizedData = validationResult.sanitizedData;
     const category = sanitizedData.category;
     const status = sanitizedData.status;
     const priority = sanitizedData.priority;
@@ -431,9 +426,8 @@ export async function GET(request: NextRequest) {
     return response;
 
   } catch (error) {
-    return SecureErrorHandler.createResponse(
-      SecureErrorHandler.createError('INTERNAL', 'Failed to fetch directories', error),
-      request
+    return SecureErrorHandler.createErrorResponse(
+      SecureErrorHandler.handleError(new Error('Failed to fetch directories'), ErrorType.INTERNAL)
     );
   }
 }
@@ -442,42 +436,39 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimit(request, {
-      maxRequests: 10,
-      windowMs: 60 * 1000, // 1 minute
-      keyGenerator: (req) => `directories-post-${req.ip || 'unknown'}`
-    });
+    const ip = request.headers.get('x-forwarded-for') || 'unknown';
+    const rateLimiter = rateLimit({ interval: 60000, uniqueTokenPerInterval: 100 });
+    const rateLimitResponse = NextResponse.next();
     
-    if (!rateLimitResult.success) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('RATE_LIMIT', 'Too many requests'),
-        request
+    try {
+      await rateLimiter.check(rateLimitResponse, 10, `directories-post-${ip}`);
+    } catch {
+      return SecureErrorHandler.createErrorResponse(
+        SecureErrorHandler.handleError(new Error('Rate limit exceeded'), ErrorType.RATE_LIMIT)
       );
     }
 
     // Authentication and authorization
     const authResult = await AuthMiddleware.requireAuth(request);
     if (!authResult.success) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('AUTH', authResult.error || 'Authentication required'),
-        request
+      return SecureErrorHandler.createErrorResponse(
+        SecureErrorHandler.handleError(new Error(authResult.error || 'Authentication required'), ErrorType.AUTHENTICATION)
       );
     }
 
     const hasPermission = await AuthMiddleware.checkPermission(authResult.user!, 'admin:write');
     if (!hasPermission) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('AUTH', 'Insufficient permissions'),
-        request
+      return SecureErrorHandler.createErrorResponse(
+        SecureErrorHandler.handleError(new Error('Insufficient permissions'), ErrorType.AUTHORIZATION)
       );
     }
 
     // CSRF validation
-    const csrfResult = await validateCSRFToken(request);
-    if (!csrfResult.valid) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('CSRF', 'Invalid CSRF token'),
-        request
+    const csrfToken = request.headers.get('x-csrf-token');
+    const csrfResult = await validateCSRFToken(csrfToken);
+    if (!csrfResult) {
+      return SecureErrorHandler.createErrorResponse(
+        SecureErrorHandler.handleError(new Error('Invalid CSRF token'), ErrorType.AUTHENTICATION)
       );
     }
 
@@ -485,39 +476,35 @@ export async function POST(request: NextRequest) {
     const { action, ...data } = body;
 
     // Input validation
-    const validator = new InputValidator();
     if (!action || typeof action !== 'string') {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('VALIDATION', 'Action is required'),
-        request
+      return SecureErrorHandler.createErrorResponse(
+        SecureErrorHandler.handleError(new Error('Action is required'), ErrorType.VALIDATION)
       );
     }
 
     switch (action) {
       case 'update_status':
         const updateStatusSchema = {
-          directoryId: { type: 'string', required: true, minLength: 1 },
-          status: { type: 'string', required: true, enum: ['not_submitted', 'submitted', 'approved', 'rejected', 'pending'] },
-          notes: { type: 'string', maxLength: 500, optional: true }
+          directoryId: { type: 'string' as const, required: true, minLength: 1 },
+          status: { type: 'string' as const, required: true, enum: ['not_submitted', 'submitted', 'approved', 'rejected', 'pending'] },
+          notes: { type: 'string' as const, maxLength: 500, optional: true }
         };
 
-        const updateValidation = validator.validate(data, updateStatusSchema);
+        const updateValidation = InputValidator.validate(data, updateStatusSchema);
         if (!updateValidation.isValid) {
-          return SecureErrorHandler.createResponse(
-            SecureErrorHandler.createError('VALIDATION', 'Invalid update data', updateValidation.errors),
-            request
+          return SecureErrorHandler.createErrorResponse(
+            SecureErrorHandler.handleError(new Error('Invalid update data'), ErrorType.VALIDATION)
           );
         }
 
-        const sanitizedUpdate = validator.sanitize(updateValidation.data);
+        const sanitizedUpdate = updateValidation.sanitizedData;
         const { directoryId, status, notes } = sanitizedUpdate;
 
         // In a real implementation, update database
         const directoryIndex = directories.findIndex(d => d.id === directoryId);
         if (directoryIndex === -1) {
-          return SecureErrorHandler.createResponse(
-            SecureErrorHandler.createError('NOT_FOUND', 'Directory not found'),
-            request
+          return SecureErrorHandler.createErrorResponse(
+            SecureErrorHandler.handleError(new Error('Directory not found'), ErrorType.NOT_FOUND)
           );
         }
 
@@ -539,27 +526,25 @@ export async function POST(request: NextRequest) {
 
       case 'bulk_update':
         const bulkUpdateSchema = {
-          directoryIds: { type: 'array', required: true, minLength: 1, maxLength: 50 },
-          newStatus: { type: 'string', required: true, enum: ['not_submitted', 'submitted', 'approved', 'rejected', 'pending'] }
+          directoryIds: { type: 'array' as const, required: true, minLength: 1, maxLength: 50 },
+          newStatus: { type: 'string' as const, required: true, enum: ['not_submitted', 'submitted', 'approved', 'rejected', 'pending'] }
         };
 
-        const bulkValidation = validator.validate(data, bulkUpdateSchema);
+        const bulkValidation = InputValidator.validate(data, bulkUpdateSchema);
         if (!bulkValidation.isValid) {
-          return SecureErrorHandler.createResponse(
-            SecureErrorHandler.createError('VALIDATION', 'Invalid bulk update data', bulkValidation.errors),
-            request
+          return SecureErrorHandler.createErrorResponse(
+            SecureErrorHandler.handleError(new Error('Invalid bulk update data'), ErrorType.VALIDATION)
           );
         }
 
-        const sanitizedBulk = validator.sanitize(bulkValidation.data);
+        const sanitizedBulk = bulkValidation.sanitizedData;
         const { directoryIds, newStatus } = sanitizedBulk;
 
         // Validate each directory ID
         for (const id of directoryIds) {
           if (typeof id !== 'string' || id.length === 0) {
-            return SecureErrorHandler.createResponse(
-              SecureErrorHandler.createError('VALIDATION', 'Invalid directory ID in array'),
-              request
+            return SecureErrorHandler.createErrorResponse(
+              SecureErrorHandler.handleError(new Error('Invalid directory ID in array'), ErrorType.VALIDATION)
             );
           }
         }
@@ -586,33 +571,35 @@ export async function POST(request: NextRequest) {
 
       case 'add_directory':
         const addDirectorySchema = {
-          name: { type: 'string', required: true, minLength: 1, maxLength: 100 },
-          url: { type: 'string', required: true, pattern: CommonSchemas.url.pattern },
-          category: { type: 'string', required: true, enum: ['product_launch', 'startup_community', 'software_directory', 'tech_news', 'business_listing', 'ai_tools', 'general'] },
-          domainAuthority: { type: 'number', min: 0, max: 100, optional: true },
-          submissionType: { type: 'string', enum: ['free', 'paid', 'freemium'], optional: true },
-          requirements: { type: 'array', optional: true },
-          submissionUrl: { type: 'string', pattern: CommonSchemas.url.pattern, optional: true },
-          estimatedTraffic: { type: 'number', min: 0, optional: true },
-          priority: { type: 'string', enum: ['low', 'medium', 'high'], optional: true }
+          name: { type: 'string' as const, required: true, minLength: 1, maxLength: 100 },
+          url: { type: 'url' as const, required: true },
+          category: { type: 'string' as const, required: true, enum: ['product_launch', 'startup_community', 'software_directory', 'tech_news', 'business_listing', 'ai_tools', 'general'] },
+          domainAuthority: { type: 'number' as const, min: 0, max: 100, optional: true },
+          submissionType: { type: 'string' as const, enum: ['free', 'paid', 'freemium'], optional: true },
+          requirements: { type: 'array' as const, optional: true },
+          submissionUrl: { type: 'url' as const, optional: true },
+          estimatedTraffic: { type: 'number' as const, min: 0, optional: true },
+          priority: { type: 'string' as const, enum: ['low', 'medium', 'high'], optional: true }
         };
 
-        const addValidation = validator.validate(data, addDirectorySchema);
+        const addValidation = InputValidator.validate(data, addDirectorySchema);
         if (!addValidation.isValid) {
-          return SecureErrorHandler.createResponse(
-            SecureErrorHandler.createError('VALIDATION', 'Invalid directory data', addValidation.errors),
-            request
+          return SecureErrorHandler.createErrorResponse(
+            SecureErrorHandler.handleError(new Error('Invalid directory data'), ErrorType.VALIDATION)
           );
         }
 
-        const sanitizedDirectory = validator.sanitize(addValidation.data);
+        const sanitizedDirectory = addValidation.sanitizedData;
         const newDirectory = {
           id: `custom_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          ...sanitizedDirectory,
+          name: sanitizedDirectory.name,
+          url: sanitizedDirectory.url,
+          category: sanitizedDirectory.category,
           status: 'not_submitted' as const,
           domainAuthority: sanitizedDirectory.domainAuthority || 0,
           submissionType: sanitizedDirectory.submissionType || 'free' as const,
           requirements: sanitizedDirectory.requirements || [],
+          submissionUrl: sanitizedDirectory.submissionUrl || '',
           estimatedTraffic: sanitizedDirectory.estimatedTraffic || 0,
           priority: sanitizedDirectory.priority || 'medium' as const
         };
@@ -628,16 +615,14 @@ export async function POST(request: NextRequest) {
         return addResponse;
 
       default:
-        return SecureErrorHandler.createResponse(
-          SecureErrorHandler.createError('VALIDATION', 'Invalid action'),
-          request
+        return SecureErrorHandler.createErrorResponse(
+          SecureErrorHandler.handleError(new Error('Invalid action'), ErrorType.VALIDATION)
         );
     }
 
   } catch (error) {
-    return SecureErrorHandler.createResponse(
-      SecureErrorHandler.createError('INTERNAL', 'Failed to update directory', error),
-      request
+    return SecureErrorHandler.createErrorResponse(
+      SecureErrorHandler.handleError(new Error('Failed to update directory'), ErrorType.INTERNAL)
     );
   }
 }
@@ -646,42 +631,43 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimit(request, {
-      maxRequests: 5,
-      windowMs: 60 * 1000, // 1 minute
-      keyGenerator: (req) => `directories-delete-${req.ip || 'unknown'}`
+    const rateLimiter = rateLimit({
+      interval: 60 * 1000, // 1 minute
+      uniqueTokenPerInterval: 500
     });
     
-    if (!rateLimitResult.success) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('RATE_LIMIT', 'Too many requests'),
-        request
+    const ip = request.headers.get('x-forwarded-for') || 'unknown';
+    const rateLimitResponse = NextResponse.next();
+    
+    try {
+      await rateLimiter.check(rateLimitResponse, 5, ip + '/admin/directories/delete');
+    } catch (error) {
+      return SecureErrorHandler.createErrorResponse(
+        SecureErrorHandler.handleError(new Error('Too many requests'), ErrorType.RATE_LIMIT)
       );
     }
 
     // Authentication and authorization
     const authResult = await AuthMiddleware.requireAuth(request);
     if (!authResult.success) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('AUTH', authResult.error || 'Authentication required'),
-        request
+      return SecureErrorHandler.createErrorResponse(
+        SecureErrorHandler.handleError(new Error(authResult.error || 'Authentication required'), ErrorType.AUTHENTICATION)
       );
     }
 
     const hasPermission = await AuthMiddleware.checkPermission(authResult.user!, 'admin:delete');
     if (!hasPermission) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('AUTH', 'Insufficient permissions'),
-        request
+      return SecureErrorHandler.createErrorResponse(
+        SecureErrorHandler.handleError(new Error('Insufficient permissions'), ErrorType.AUTHORIZATION)
       );
     }
 
     // CSRF validation
-    const csrfResult = await validateCSRFToken(request);
-    if (!csrfResult.valid) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('CSRF', 'Invalid CSRF token'),
-        request
+    const csrfToken = request.headers.get('x-csrf-token');
+    const csrfResult = await validateCSRFToken(csrfToken);
+    if (!csrfResult) {
+      return SecureErrorHandler.createErrorResponse(
+        SecureErrorHandler.handleError(new Error('Invalid CSRF token'), ErrorType.AUTHENTICATION)
       );
     }
 
@@ -689,35 +675,31 @@ export async function DELETE(request: NextRequest) {
     const directoryId = searchParams.get('id');
     
     // Input validation
-    const validator = new InputValidator();
     const idSchema = {
-      id: { type: 'string', required: true, minLength: 1, maxLength: 100 }
+      id: { type: 'string' as const, required: true, minLength: 1, maxLength: 100 }
     };
 
-    const validationResult = validator.validate({ id: directoryId }, idSchema);
+    const validationResult = InputValidator.validate({ id: directoryId }, idSchema);
     if (!validationResult.isValid) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('VALIDATION', 'Invalid directory ID', validationResult.errors),
-        request
+      return SecureErrorHandler.createErrorResponse(
+        SecureErrorHandler.handleError(new Error('Invalid directory ID'), ErrorType.VALIDATION)
       );
     }
 
-    const sanitizedData = validator.sanitize(validationResult.data);
+    const sanitizedData = validationResult.sanitizedData;
     const sanitizedDirectoryId = sanitizedData.id;
 
     const directoryIndex = directories.findIndex(d => d.id === sanitizedDirectoryId);
     if (directoryIndex === -1) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('NOT_FOUND', 'Directory not found'),
-        request
+      return SecureErrorHandler.createErrorResponse(
+        SecureErrorHandler.handleError(new Error('Directory not found'), ErrorType.NOT_FOUND)
       );
     }
 
     // Only allow deletion of custom directories
     if (!sanitizedDirectoryId.startsWith('custom_')) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('FORBIDDEN', 'Cannot delete built-in directories'),
-        request
+      return SecureErrorHandler.createErrorResponse(
+        SecureErrorHandler.handleError(new Error('Cannot delete built-in directories'), ErrorType.AUTHORIZATION)
       );
     }
 
@@ -731,9 +713,8 @@ export async function DELETE(request: NextRequest) {
     return response;
 
   } catch (error) {
-    return SecureErrorHandler.createResponse(
-      SecureErrorHandler.createError('INTERNAL', 'Failed to delete directory', error),
-      request
+    return SecureErrorHandler.createErrorResponse(
+      SecureErrorHandler.handleError(new Error('Failed to delete directory'), ErrorType.INTERNAL)
     );
   }
 }

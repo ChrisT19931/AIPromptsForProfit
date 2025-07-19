@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { InputValidator } from '@/lib/validation';
-import { TokenManager, PasswordManager } from '@/lib/auth';
-import { validateCSRFToken, generateCSRFToken } from '@/lib/csrf';
+import { TokenManager } from '@/lib/auth';
+import { generateCSRFToken } from '@/lib/csrf';
 
 // Rate limiting for login attempts
 const loginAttempts = new Map<string, { count: number; resetTime: number; lockedUntil?: number }>();
@@ -55,7 +54,7 @@ export async function POST(request: NextRequest) {
     let body;
     try {
       body = await request.json();
-    } catch (error) {
+    } catch {
       return new NextResponse(
         JSON.stringify({ error: 'Invalid JSON payload' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
@@ -101,8 +100,7 @@ export async function POST(request: NextRequest) {
       resetLoginAttempts(ip);
 
       // Create simple token
-      const tokenManager = new TokenManager();
-      const accessToken = tokenManager.generateAccessToken({ id: '1', username, role: 'admin' });
+      const accessToken = TokenManager.generateAccessToken({ id: '1', username, role: 'admin' });
       
       // Create response
       const response = NextResponse.json({
@@ -138,14 +136,14 @@ export async function POST(request: NextRequest) {
 
       return response;
     } catch (error) {
-      console.error('Login error:', error);
-      return new NextResponse(
-        JSON.stringify({ error: 'Internal server error' }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
-  } catch (error) {
-    console.error('Login error:', error);
+       console.error('Login error:', error);
+       return new NextResponse(
+         JSON.stringify({ error: 'Internal server error' }),
+         { status: 500, headers: { 'Content-Type': 'application/json' } }
+       );
+     }
+  } catch {
+    console.error('Login error');
     return new NextResponse(
       JSON.stringify({ error: 'Internal server error' }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
@@ -156,7 +154,9 @@ export async function POST(request: NextRequest) {
 // Logout endpoint
 export async function DELETE(request: NextRequest) {
   try {
-    const adminToken = request.cookies.get('admin-token')?.value;
+    // Clear admin token
+     const adminToken = request.cookies.get('admin-token')?.value;
+     console.log('Logging out admin token:', adminToken ? 'present' : 'not found');
     
     const response = NextResponse.json({ success: true, message: 'Logged out successfully' });
     
@@ -169,8 +169,8 @@ export async function DELETE(request: NextRequest) {
     });
     
     return response;
-  } catch (error) {
-    console.error('Logout error:', error);
+  } catch {
+    console.error('Logout error');
     return new NextResponse(
       JSON.stringify({ error: 'Internal server error' }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
@@ -191,9 +191,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Simple token validation
-    const tokenManager = new TokenManager();
     try {
-      const decoded = tokenManager.verifyAccessToken(adminToken);
+      const decoded = TokenManager.verifyAccessToken(adminToken);
       
       return NextResponse.json({
         success: true,
@@ -210,14 +209,14 @@ export async function GET(request: NextRequest) {
           'X-Content-Type-Options': 'nosniff'
         }
       });
-    } catch (tokenError) {
+    } catch {
       return new NextResponse(
         JSON.stringify({ error: 'Invalid or expired session' }),
         { status: 401, headers: { 'Content-Type': 'application/json' } }
       );
     }
-  } catch (error) {
-    console.error('Session check error:', error);
+  } catch {
+    console.error('Session check error');
     return new NextResponse(
       JSON.stringify({ error: 'Internal server error' }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
