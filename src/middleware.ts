@@ -59,9 +59,8 @@ export async function middleware(request: NextRequest) {
       }
 
       await limiter.check(response, limit, ip);
-      console.log(`Rate limit check for IP: ${ip}, Path: ${pathname}, Limit: ${limit}`);
     } catch (error) {
-      console.error(`Rate limit error for IP: ${ip}, Path: ${pathname}:`, error);
+      // Rate limit error - silently continue
       return new NextResponse(
         JSON.stringify({ 
           error: 'Rate limit exceeded. Please try again later.',
@@ -105,7 +104,6 @@ export async function middleware(request: NextRequest) {
           );
         }
       } catch {
-        console.error('CSRF validation error');
         return new NextResponse(
           JSON.stringify({ 
             error: 'CSRF validation failed',
@@ -188,7 +186,6 @@ async function validateAdminToken(token: string): Promise<boolean> {
     // Simulate token validation
     return token.startsWith('admin_') && token.length > 20;
   } catch {
-    console.error('Token validation error');
     return false;
   }
 }

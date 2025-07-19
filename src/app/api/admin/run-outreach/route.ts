@@ -97,8 +97,7 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
   }
 
   const { websites } = validation.sanitizedData;
-  // Template will be used for future email customization
-  // const { template } = validation.sanitizedData;
+  
 
   try {
 
@@ -145,8 +144,7 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
       timestamp: new Date().toISOString()
     });
 
-    // Use template for outreach (currently simulated)
-    console.log('Using template for outreach campaign');
+    // Using template for outreach campaign
 
     for (const website of websites) {
       try {

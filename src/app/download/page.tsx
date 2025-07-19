@@ -30,7 +30,7 @@ function DownloadContent() {
             return;
           }
         } catch (error) {
-          console.error('Error verifying session:', error);
+          setIsValid(false);
         }
       }
       

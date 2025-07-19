@@ -137,8 +137,7 @@ export async function validateCSRFToken(
     tokenStore.delete(token);
     return true;
     
-  } catch {
-    console.error('CSRF token validation error');
+  } catch (error) {
     return false;
   }
 }

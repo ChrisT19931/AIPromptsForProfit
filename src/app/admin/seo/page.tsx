@@ -23,8 +23,7 @@ export default function SEOTools() {
         throw new Error('Submission failed');
       }
     } catch (error) {
-      console.error('Sitemap submission error:', error);
-      alert('Failed to submit sitemap. Please try again.');
+      setMessage('Failed to submit sitemap. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

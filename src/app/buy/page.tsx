@@ -85,8 +85,7 @@ export default function Buy() {
         await stripe.redirectToCheckout({ sessionId });
       }
     } catch (error) {
-      console.error('Error:', error);
-      setIsLoading(false);
+        setIsLoading(false);
     }
   };
 

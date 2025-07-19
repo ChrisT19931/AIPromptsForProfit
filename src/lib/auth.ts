@@ -67,7 +67,6 @@ export class PasswordManager {
     try {
       return await bcrypt.compare(password, hash);
     } catch (error) {
-      console.error('Password verification error:', error);
       return false;
     }
   }
@@ -188,7 +187,6 @@ export class TokenManager {
 
       return decoded;
     } catch (error) {
-      console.error('Access token verification failed:', error);
       return null;
     }
   }
@@ -205,7 +203,6 @@ export class TokenManager {
 
       return decoded;
     } catch (error) {
-      console.error('Refresh token verification failed:', error);
       return null;
     }
   }
@@ -371,7 +368,6 @@ export class AuthMiddleware {
 
       return { success: true, user };
     } catch (error) {
-      console.error('Authentication error:', error);
       return { success: false, error: 'Authentication failed' };
     }
   }
@@ -426,7 +422,6 @@ export class AuthMiddleware {
 
       return { success: true, user };
     } catch (error) {
-      console.error('Admin authentication error:', error);
       return { success: false, error: 'Authentication failed' };
     }
   }

@@ -14,7 +14,6 @@ export async function POST(req: NextRequest) {
   try {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (error) {
-    console.error('Webhook signature verification failed:', error);
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
@@ -22,7 +21,7 @@ export async function POST(req: NextRequest) {
   switch (event.type) {
     case 'checkout.session.completed':
       const session = event.data.object as Stripe.Checkout.Session;
-      console.log('Payment successful for session:', session.id);
+      // Payment successful
       
       // Here you could:
       // - Send confirmation email
@@ -34,11 +33,11 @@ export async function POST(req: NextRequest) {
     
     case 'payment_intent.succeeded':
       const paymentIntent = event.data.object as Stripe.PaymentIntent;
-      console.log('Payment succeeded:', paymentIntent.id);
+      // Payment succeeded
       break;
     
     default:
-      console.log(`Unhandled event type: ${event.type}`);
+      // Unhandled event type
   }
 
   return NextResponse.json({ received: true });

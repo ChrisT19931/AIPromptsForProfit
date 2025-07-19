@@ -37,7 +37,6 @@ export async function GET(req: NextRequest) {
       );
     }
   } catch (error) {
-    console.error('Error verifying session:', error);
     return NextResponse.json(
       { valid: false, error: 'Invalid session' },
       { status: 400 }

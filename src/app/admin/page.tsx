@@ -69,7 +69,6 @@ export default function AdminDashboard() {
           break;
       }
     } catch (error) {
-      console.error('Action failed:', error);
       alert('Action failed. Please try again.');
     }
   };
@@ -84,7 +83,7 @@ export default function AdminDashboard() {
           setStats(data);
         }
       } catch (error) {
-        console.error('Failed to load stats:', error);
+        // Failed to load stats
       }
     };
 

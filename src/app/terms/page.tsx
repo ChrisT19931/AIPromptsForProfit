@@ -3,7 +3,6 @@
 import { motion } from 'framer-motion';
 import Header from '../../../components/Header';
 import Footer from '../../../components/Footer';
-import Head from 'next/head';
 
 export default function TermsOfService() {
   const termsStructuredData = {
@@ -27,26 +26,6 @@ export default function TermsOfService() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <Head>
-        <title>Terms of Service - Ventaro AI | AI Prompts Terms & Conditions</title>
-        <meta name="description" content="Read Ventaro AI's terms of service for purchasing AI prompts and tools. Australian business terms and conditions for digital products including no refunds policy." />
-        <meta name="keywords" content="terms of service, terms and conditions, AI prompts terms, digital product terms, Australian business terms, no refunds policy, AI tools conditions, Ventaro AI terms" />
-        <meta property="og:title" content="Terms of Service - Ventaro AI" />
-        <meta property="og:description" content="Terms and conditions for using Ventaro AI products and services. Digital product terms with no refunds policy." />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://ventaroai.com/terms" />
-        <meta name="twitter:card" content="summary" />
-        <meta name="twitter:title" content="Terms of Service - Ventaro AI" />
-        <meta name="twitter:description" content="Terms and conditions for purchasing and using Ventaro AI's digital AI prompts products." />
-        <meta name="robots" content="index, follow" />
-        <link rel="canonical" href="https://ventaroai.com/terms" />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(termsStructuredData),
-          }}
-        />
-      </Head>
       <Header />
       
       <section className="py-20 px-6">

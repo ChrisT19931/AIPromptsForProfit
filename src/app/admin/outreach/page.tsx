@@ -79,7 +79,6 @@ chris.t@ventarosales.com`);
         throw new Error('Outreach failed');
       }
     } catch (error) {
-      console.error('Outreach error:', error);
       alert('Outreach campaign failed. Please try again.');
     } finally {
       setIsRunning(false);
@@ -94,7 +93,6 @@ chris.t@ventarosales.com`);
         setOutreachResults(data.results || []);
       }
     } catch (error) {
-      console.error('Failed to load outreach history:', error);
     }
   };
 

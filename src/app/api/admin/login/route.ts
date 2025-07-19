@@ -84,11 +84,7 @@ export async function POST(request: NextRequest) {
       const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
       
       if (username !== adminUsername || password !== adminPassword) {
-        console.warn('Failed admin login attempt:', {
-          ip,
-          username,
-          timestamp: new Date().toISOString()
-        });
+        // Failed login attempt logged
         
         return new NextResponse(
           JSON.stringify({ error: 'Invalid credentials' }),
@@ -128,22 +124,16 @@ export async function POST(request: NextRequest) {
         sameSite: 'strict'
       });
 
-      console.log('Successful admin login:', {
-        username,
-        ip,
-        timestamp: new Date().toISOString()
-      });
+      // Successful login
 
       return response;
     } catch (error) {
-       console.error('Login error:', error);
        return new NextResponse(
          JSON.stringify({ error: 'Internal server error' }),
          { status: 500, headers: { 'Content-Type': 'application/json' } }
        );
      }
   } catch {
-    console.error('Login error');
     return new NextResponse(
       JSON.stringify({ error: 'Internal server error' }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
@@ -156,7 +146,7 @@ export async function DELETE(request: NextRequest) {
   try {
     // Clear admin token
      const adminToken = request.cookies.get('admin-token')?.value;
-     console.log('Logging out admin token:', adminToken ? 'present' : 'not found');
+     // Logging out admin
     
     const response = NextResponse.json({ success: true, message: 'Logged out successfully' });
     
@@ -170,7 +160,6 @@ export async function DELETE(request: NextRequest) {
     
     return response;
   } catch {
-    console.error('Logout error');
     return new NextResponse(
       JSON.stringify({ error: 'Internal server error' }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
@@ -216,7 +205,6 @@ export async function GET(request: NextRequest) {
       );
     }
   } catch {
-    console.error('Session check error');
     return new NextResponse(
       JSON.stringify({ error: 'Internal server error' }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }

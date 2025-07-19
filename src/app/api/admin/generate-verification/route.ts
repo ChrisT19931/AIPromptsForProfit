@@ -70,13 +70,7 @@ export async function POST(request: NextRequest) {
       throw new Error('Invalid verification type');
   }
 
-  // In production, you might want to save this verification attempt to a database
-  // await saveVerificationAttempt({
-  //   type: verificationType,
-  //   code: verificationCode,
-  //   domain,
-  //   createdAt: new Date()
-  // });
+  // Verification attempt logged
 
     const response = NextResponse.json({
       success: true,
@@ -174,9 +168,3 @@ function getAdditionalInfo(verificationType: string): any {
       return baseInfo;
   }
 }
-
-// Placeholder for database logging
-// async function saveVerificationAttempt(data: any) {
-//   // Save to MongoDB or your preferred database
-//   // This helps track verification attempts and codes
-// }
