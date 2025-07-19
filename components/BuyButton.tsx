@@ -38,9 +38,9 @@ export default function BuyButton({ className = '', size = 'md' }: BuyButtonProp
       <Link 
         href="/buy"
         className={`
-          bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold rounded-lg 
-          hover:from-yellow-300 hover:to-yellow-400 transition-all duration-300 
-          shadow-lg hover:shadow-xl border-2 border-yellow-300
+          bg-gradient-to-r from-gray-300 to-gray-500 text-black font-bold rounded-lg 
+          hover:from-gray-200 hover:to-gray-400 transition-all duration-300 
+          shadow-lg hover:shadow-xl border-2 border-gray-300
           relative overflow-hidden group inline-block
           ${sizeClasses[size]} ${className}
         `}

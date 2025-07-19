@@ -1,0 +1,45 @@
+{
+  "name": "Ventaro AI - AI Prompts For Profit",
+  "short_name": "Ventaro AI",
+  "description": "Premium AI prompts designed to help you earn money online. Australian-made AI tools for ChatGPT, Claude, and more.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en-AU",
+  "categories": ["business", "productivity", "education"],
+  "icons": [
+    {
+      "src": "/assets/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/assets/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/assets/screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Ventaro AI Homepage"
+    },
+    {
+      "src": "/assets/screenshot-narrow.png",
+      "sizes": "640x1136",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Ventaro AI Mobile View"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}

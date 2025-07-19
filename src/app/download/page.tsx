@@ -1,10 +1,97 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Header from '../../../components/Header';
 import Footer from '../../../components/Footer';
+import Link from 'next/link';
 
 export default function Download() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Check if user is authenticated
+    const email = localStorage.getItem('userEmail');
+    const adminStatus = localStorage.getItem('isAdmin') === 'true';
+    
+    if (email) {
+      setUserEmail(email);
+      setIsAdmin(adminStatus);
+      setIsAuthenticated(true);
+    }
+    
+    setIsLoading(false);
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <section className="py-20 px-6">
+          <div className="max-w-2xl mx-auto text-center">
+            <motion.div 
+              className="bg-white rounded-xl shadow-xl p-8"
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+              <motion.h1 
+                className="text-3xl font-bold mb-6 text-gray-900"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                Access Required
+              </motion.h1>
+              <motion.p 
+                className="text-lg text-gray-600 mb-8"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+              >
+                Please log in with your purchase email to access your AI prompts.
+              </motion.p>
+              <motion.div 
+                className="space-y-4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+              >
+                <Link 
+                  href="/login"
+                  className="inline-block bg-blue-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Login to Access
+                </Link>
+                <div className="text-sm text-gray-500">
+                  Don't have the prompts yet?{' '}
+                  <Link href="/buy" className="text-blue-600 hover:text-blue-800 underline">
+                    Purchase here
+                  </Link>
+                </div>
+              </motion.div>
+            </motion.div>
+          </div>
+        </section>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -24,7 +111,7 @@ export default function Download() {
             {/* Success Message */}
             <div className="mb-8">
               <motion.div 
-                className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6"
+                className="w-20 h-20 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-6"
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ 
@@ -42,27 +129,30 @@ export default function Download() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.4 }}
               >
-                Payment Successful!
+                {isAdmin ? 'Admin Access' : 'Welcome Back!'}
               </motion.h1>
               <motion.p 
-                className="text-lg text-gray-600"
+                className="text-lg text-black font-bold"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.5 }}
               >
-                Thank you for your purchase. Your AI prompts are ready to download.
+                {isAdmin 
+                  ? 'You have admin access to all AI prompts.' 
+                  : `Welcome back, ${userEmail}! Your AI prompts are ready to download.`
+                }
               </motion.p>
-            </motion.div>
+            </div>
 
             {/* Download Section */}
             <motion.div 
-              className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-6 mb-8"
+              className="bg-gray-100 border-2 border-gray-300 rounded-lg p-6 mb-8"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.6 }}
             >
               <motion.h2 
-                className="text-xl font-semibold mb-4 text-gray-900"
+                className="text-xl font-bold mb-4 text-black"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.7 }}
@@ -70,17 +160,44 @@ export default function Download() {
                 Download Your 30 AI Prompts
               </motion.h2>
               <motion.button 
-                className="bg-yellow-400 text-black font-bold py-3 px-8 rounded-lg text-lg hover:bg-yellow-300 transition-colors mb-4"
+                className="bg-gray-400 text-black font-bold py-3 px-8 rounded-lg text-lg hover:bg-gray-300 transition-colors mb-4"
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6, delay: 0.8 }}
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  window.open('/api/generate-pdf', '_blank');
+                }}
               >
                 📥 Download PDF (30 Prompts)
               </motion.button>
+              <motion.button 
+                className="bg-blue-500 text-white font-bold py-2 px-6 rounded-lg text-sm hover:bg-blue-600 transition-colors ml-4"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6, delay: 0.9 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  const email = prompt('Enter your email to receive download link:');
+                  if (email) {
+                    fetch('/api/send-download-email', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ email })
+                    }).then(() => {
+                      alert('Download link sent to your email!');
+                    }).catch(() => {
+                      alert('Failed to send email. Please contact support.');
+                    });
+                  }
+                }}
+              >
+                📧 Email Download Link
+              </motion.button>
               <motion.p 
-                className="text-sm text-gray-600"
+                className="text-sm text-gray-600 mt-4"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.6, delay: 0.9 }}
@@ -139,9 +256,9 @@ export default function Download() {
               </ol>
             </motion.div>
 
-            {/* Support */}
+            {/* Contact */}
             <motion.div 
-              className="bg-gray-50 rounded-lg p-6"
+              className="bg-gray-50 rounded-lg p-6 text-center"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 1.6 }}
@@ -151,35 +268,30 @@ export default function Download() {
               }}
             >
               <motion.h3 
-                className="text-lg font-semibold mb-3 text-gray-900"
+                className="text-lg font-semibold mb-4 text-gray-900"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 1.7 }}
               >
-                Need Help?
+                📧 Contact Support
               </motion.h3>
-              <motion.p 
-                className="text-gray-600 mb-4"
+              <motion.div 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 1.8 }}
               >
-                If you have any questions or need support, feel free to reach out:
-              </motion.p>
-              <motion.div 
-                className="space-y-2 text-sm"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 1.9 }}
-              >
-                <p><strong>Email:</strong> chris.t@ventarosales.com</p>
-                <p><strong>Response Time:</strong> Within 24 hours</p>
+                <a 
+                  href="mailto:chris.t@ventarosales.com" 
+                  className="inline-block bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  chris.t@ventarosales.com
+                </a>
               </motion.div>
               <motion.p 
                 className="text-xs text-gray-500 mt-4"
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4, delay: 2.0 }}
+                transition={{ duration: 0.4, delay: 1.9 }}
               >
                 💡 Tip: Bookmark this page for easy re-download access
               </motion.p>

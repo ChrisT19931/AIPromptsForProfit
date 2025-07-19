@@ -14,7 +14,15 @@ export const faqs = [
 
   {
     question: "How do I download the prompts after purchase?",
-    answer: "After completing your payment, you'll be redirected to a download page where you can instantly access all 30 prompts in PDF format."
+    answer: "After completing your payment, you'll be redirected to a download page where you can instantly access all 30 prompts in PDF format. You'll also receive an email with the download link for future access."
+  },
+  {
+    question: "What if I need help or have questions?",
+    answer: "We provide full support! Email us at chris.t@ventarosales.com and we'll respond within 24 hours. Whether you need help with downloads, using the prompts, or have any other questions, we're here to help."
+  },
+  {
+    question: "Are these prompts really effective?",
+    answer: "Yes! These are battle-tested prompts used by successful entrepreneurs and freelancers. Each prompt is designed using proven copywriting and psychology principles to generate high-quality, money-making content."
   }
 ];
 

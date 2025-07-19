@@ -21,7 +21,7 @@ export default function Footer() {
             viewport={{ once: true }}
           >
             <motion.h3 
-               className="text-xl font-bold text-yellow-400 mb-4"
+               className="text-xl font-bold text-gray-300 mb-4"
                whileHover={{ scale: 1.05 }}
              >
                Ventaro AI - AI Prompts For Profit
@@ -51,7 +51,7 @@ export default function Footer() {
                   viewport={{ once: true }}
                   whileHover={{ x: 5 }}
                 >
-                  <Link href={link.href} className="block text-gray-300 hover:text-yellow-400 transition-colors">
+                  <Link href={link.href} className="block text-gray-300 hover:text-white transition-colors">
                     {link.text}
                   </Link>
                 </motion.div>
@@ -74,13 +74,13 @@ export default function Footer() {
             >
               <motion.p 
                  className="text-gray-300 mb-2"
-                 whileHover={{ color: "#fbbf24" }}
+                 whileHover={{ color: "#ffffff" }}
                >
                  Questions? We're here to help!
                </motion.p>
                <motion.a 
                  href="mailto:chris.t@ventarosales.com" 
-                 className="text-yellow-400 hover:underline"
+                 className="text-white hover:underline"
                  whileHover={{ scale: 1.05 }}
                >
                  chris.t@ventarosales.com
@@ -89,19 +89,31 @@ export default function Footer() {
           </motion.div>
         </div>
         <motion.div 
-          className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400"
+          className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
           viewport={{ once: true }}
         >
           <p>&copy; 2025 Ventaro AI - AI Prompts For Profit. All rights reserved.</p>
-          <div className="mt-2 space-x-4">
+          <div className="mt-4 space-x-6">
             <motion.span whileHover={{ scale: 1.05 }}>
-              <Link href="/privacy" className="hover:text-yellow-400 transition-colors">Privacy Policy</Link>
+              <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
             </motion.span>
             <motion.span whileHover={{ scale: 1.05 }}>
-              <Link href="/terms" className="hover:text-yellow-400 transition-colors">Terms of Service</Link>
+              <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
+            </motion.span>
+          </div>
+          <div className="mt-4 space-x-6 text-sm">
+            <motion.span whileHover={{ scale: 1.05 }}>
+              <a href="https://www.ventarosales.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+                AI Sales Tools & Business Tools
+              </a>
+            </motion.span>
+            <motion.span whileHover={{ scale: 1.05 }}>
+              <a href="https://www.ventarowear.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+                Ventaro Wear - Hyped Clothing
+              </a>
             </motion.span>
           </div>
         </motion.div>

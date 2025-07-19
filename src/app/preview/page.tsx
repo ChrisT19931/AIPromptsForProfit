@@ -8,15 +8,61 @@ import BuyButton from '../../../components/BuyButton';
 import { samplePrompts } from '../../../data/prompts';
 
 export default function Preview() {
+  const previewStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Preview AI Prompts - Money-Making ChatGPT Prompts Sample",
+    "description": "Preview 5 sample AI prompts from our collection of 30 proven money-making prompts for ChatGPT. Australian-designed AI tools for business success.",
+    "url": "https://www.ventaroai.com/preview",
+    "mainEntity": {
+      "@type": "Product",
+      "name": "30 AI Prompts Collection",
+      "description": "Premium AI prompts for making money online with ChatGPT",
+      "brand": {
+        "@type": "Brand",
+        "name": "Ventaro AI"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "10.00",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock"
+      }
+    },
+    "breadcrumb": {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://www.ventaroai.com"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Preview AI Prompts",
+          "item": "https://www.ventaroai.com/preview"
+        }
+      ]
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(previewStructuredData),
+        }}
+      />
       <Header />
       
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-black to-gray-900 text-white py-16 px-6 relative overflow-hidden">
         {/* Animated Background Elements */}
         <motion.div
-          className="absolute top-10 right-10 w-40 h-40 bg-yellow-400/10 rounded-full blur-2xl"
+          className="absolute top-10 right-10 w-40 h-40 bg-gray-400/10 rounded-full blur-2xl"
           animate={{
             scale: [1, 1.2, 1],
             opacity: [0.3, 0.6, 0.3],
@@ -36,7 +82,7 @@ export default function Preview() {
             transition={{ duration: 0.8 }}
           >
             Preview Our <motion.span 
-              className="text-yellow-400"
+              className="text-gray-300"
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.3 }}
@@ -78,17 +124,17 @@ export default function Preview() {
               >
                 <div className="flex items-start justify-between mb-4">
                   <motion.h3 
-                    className="text-2xl font-bold text-gray-900 group-hover:text-yellow-600 transition-colors"
+                    className="text-2xl font-bold text-black group-hover:text-gray-700 transition-colors"
                     whileHover={{ scale: 1.02 }}
                   >
                     {prompt.title}
                   </motion.h3>
                   <motion.span 
-                    className="bg-yellow-400 text-black px-3 py-1 rounded-full text-sm font-semibold"
+                    className="bg-gray-400 text-black px-3 py-1 rounded-full text-sm font-bold"
                     whileHover={{ 
                       scale: 1.1,
                       rotateZ: 5,
-                      backgroundColor: "#fbbf24"
+                      backgroundColor: "#9ca3af"
                     }}
                     transition={{ type: "spring", stiffness: 300 }}
                   >
@@ -111,7 +157,7 @@ export default function Preview() {
                   whileInView={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.6, delay: index * 0.1 + 0.3 }}
                 >
-                  <div className="bg-gray-50 p-6 rounded-lg border-l-4 border-yellow-400 group-hover:bg-gray-100 transition-colors">
+                  <div className="bg-gray-50 p-6 rounded-lg border-l-4 border-gray-400 group-hover:bg-gray-100 transition-colors">
                     <p className="text-sm text-gray-500 mb-2 font-semibold">FULL PROMPT:</p>
                     <div className="relative">
                       <p className="text-gray-700 filter blur-sm select-none">
@@ -157,7 +203,7 @@ export default function Preview() {
           >
             {/* Animated background glow */}
             <motion.div
-              className="absolute inset-0 bg-gradient-to-r from-yellow-400/10 via-transparent to-yellow-400/10"
+              className="absolute inset-0 bg-gradient-to-r from-gray-400/10 via-transparent to-gray-400/10"
               animate={{
                 backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
               }}

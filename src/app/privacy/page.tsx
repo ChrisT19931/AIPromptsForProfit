@@ -3,10 +3,46 @@
 import { motion } from 'framer-motion';
 import Header from '../../../components/Header';
 import Footer from '../../../components/Footer';
+import Head from 'next/head';
 
 export default function PrivacyPolicy() {
+  const privacyStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Privacy Policy - Ventaro AI",
+    "description": "Privacy policy for Ventaro AI, explaining how we collect, use, and protect your personal information when you purchase our AI prompts and tools.",
+    "url": "https://ventaroai.com/privacy",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "Ventaro AI",
+      "url": "https://ventaroai.com"
+    },
+    "dateModified": "2025-01-01",
+    "inLanguage": "en-AU"
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <Head>
+        <title>Privacy Policy - Ventaro AI | Australian AI Tools Company</title>
+        <meta name="description" content="Read Ventaro AI's privacy policy. Learn how we protect your data when you purchase our AI prompts and tools. Australian privacy standards." />
+        <meta name="keywords" content="privacy policy, data protection, Australian privacy, AI tools privacy, Ventaro AI privacy, personal information protection, GDPR compliance" />
+        <meta property="og:title" content="Privacy Policy - Ventaro AI" />
+        <meta property="og:description" content="Our commitment to protecting your privacy and data security when using Ventaro AI products." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://ventaroai.com/privacy" />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="Privacy Policy - Ventaro AI" />
+        <meta name="twitter:description" content="Learn how Ventaro AI protects your personal information and privacy." />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href="https://ventaroai.com/privacy" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(privacyStructuredData),
+          }}
+        />
+      </Head>
       <Header />
       
       <section className="py-20 px-6">
