@@ -50,6 +50,6 @@ export async function POST(request: NextRequest) {
 }
 
 // Helper function to add email to purchased list (called from webhook)
-export function addPurchasedEmail(email: string) {
+function addPurchasedEmail(email: string) {
   (purchasedEmails as Set<string>).add(email.toLowerCase());
 }

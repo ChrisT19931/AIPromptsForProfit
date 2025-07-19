@@ -127,7 +127,7 @@ export default function TermsOfService() {
               
               <h2 className="text-xl font-semibold mb-4">Limitation of Liability</h2>
               <p className="mb-4">
-                Ventaro AI - AI Prompts For Profit provides these prompts "as is" without any guarantees 
+                Ventaro AI - AI Prompts For Profit provides these prompts &quot;as is&quot; without any guarantees 
                 of specific results or income. Your success depends on various factors including your effort, 
                 market conditions, and implementation.
               </p>
