@@ -163,11 +163,11 @@ export default function Preview() {
                       <p className="text-gray-700 filter blur-sm select-none">
                         {prompt.fullPrompt}
                       </p>
-                      <motion.div 
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/80 to-white flex items-center justify-center"
-                        whileHover={{ scale: 1.05 }}
-                      >
-                        <Link href="/buy">
+                      <Link href="/buy" className="absolute inset-0 flex items-center justify-center">
+                        <motion.div 
+                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/80 to-white flex items-center justify-center"
+                          whileHover={{ scale: 1.05 }}
+                        >
                           <motion.div 
                             className="bg-black text-white px-6 py-3 rounded-lg font-semibold cursor-pointer"
                             whileHover={{ 
@@ -179,8 +179,8 @@ export default function Preview() {
                           >
                             🔒 Unlock to View Full Prompt
                           </motion.div>
-                        </Link>
-                      </motion.div>
+                        </motion.div>
+                      </Link>
                     </div>
                   </div>
                 </motion.div>

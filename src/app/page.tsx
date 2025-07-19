@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import BuyButton from '../../components/BuyButton';
@@ -9,6 +10,42 @@ import { faqs } from '../../data/faq';
 import Head from 'next/head';
 
 export default function Home() {
+  const [subscribeEmail, setSubscribeEmail] = useState('');
+  const [subscribeStatus, setSubscribeStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [subscribeMessage, setSubscribeMessage] = useState('');
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!subscribeEmail) return;
+    
+    setSubscribeStatus('loading');
+    setSubscribeMessage('');
+    
+    try {
+      const response = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: subscribeEmail }),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        setSubscribeStatus('success');
+        setSubscribeMessage('Thanks for subscribing! You\'ll receive AI updates soon.');
+        setSubscribeEmail('');
+      } else {
+        setSubscribeStatus('error');
+        setSubscribeMessage(data.error || 'Failed to subscribe. Please try again.');
+      }
+    } catch (error) {
+      setSubscribeStatus('error');
+      setSubscribeMessage('An error occurred. Please try again later.');
+    }
+  };
+
   const productStructuredData = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -251,12 +288,6 @@ export default function Home() {
                 className="bg-white text-black px-8 py-4 text-lg font-semibold rounded-lg hover:bg-gray-100 transition-all duration-300 shadow-lg hover:shadow-xl border border-gray-200 relative overflow-hidden group"
               >
                 <span className="relative z-10">Preview Prompts</span>
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-100 to-transparent -skew-x-12"
-                  initial={{ x: '-100%' }}
-                  whileHover={{ x: '200%' }}
-                  transition={{ duration: 0.6 }}
-                />
               </Link>
             </motion.div>
             <motion.div
@@ -376,32 +407,64 @@ export default function Home() {
           >
             Subscribe to Ventaro AI for exclusive access to cutting-edge AI tools, prompts, and business strategies
           </motion.p>
-          <motion.div 
-            className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto mb-6"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            viewport={{ once: true }}
-          >
-            <input 
-              type="email" 
-              placeholder="Enter your email for AI updates"
-              className="flex-1 px-6 py-4 rounded-lg text-black font-medium focus:outline-none focus:ring-2 focus:ring-gray-400 shadow-lg border border-gray-200"
-            />
-            <motion.button 
-              className="bg-gradient-to-r from-gray-300 to-gray-500 text-black font-bold px-8 py-4 rounded-lg hover:from-gray-200 hover:to-gray-400 transition-all shadow-lg relative overflow-hidden group"
-              whileHover={{ scale: 1.05, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.2)' }}
-              whileTap={{ scale: 0.95 }}
+          <form onSubmit={handleSubscribe}>
+            <motion.div 
+              className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto mb-6"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              viewport={{ once: true }}
             >
-              <span className="relative z-10">Subscribe</span>
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12"
-                initial={{ x: '-100%' }}
-                whileHover={{ x: '200%' }}
-                transition={{ duration: 0.6 }}
+              <input 
+                type="email" 
+                placeholder="Enter your email for AI updates"
+                className="flex-1 px-6 py-4 rounded-lg text-black font-medium focus:outline-none focus:ring-2 focus:ring-gray-400 shadow-lg border border-gray-200"
+                value={subscribeEmail}
+                onChange={(e) => setSubscribeEmail(e.target.value)}
+                required
               />
-            </motion.button>
-          </motion.div>
+              <motion.button 
+                type="submit"
+                className="bg-gradient-to-r from-gray-300 to-gray-500 text-black font-bold px-8 py-4 rounded-lg hover:from-gray-200 hover:to-gray-400 transition-all shadow-lg relative overflow-hidden group"
+                whileHover={{ scale: 1.05, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.2)' }}
+                whileTap={{ scale: 0.95 }}
+                disabled={subscribeStatus === 'loading'}
+              >
+                <span className="relative z-10">
+                  {subscribeStatus === 'loading' ? 'Subscribing...' : 'Subscribe'}
+                </span>
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12"
+                  initial={{ x: '-100%' }}
+                  whileHover={{ x: '200%' }}
+                  transition={{ duration: 0.6 }}
+                />
+              </motion.button>
+            </motion.div>
+          </form>
+          
+          {subscribeStatus === 'success' && (
+            <motion.p 
+              className="text-sm text-green-400 mb-4"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              {subscribeMessage}
+            </motion.p>
+          )}
+          
+          {subscribeStatus === 'error' && (
+            <motion.p 
+              className="text-sm text-red-400 mb-4"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              {subscribeMessage}
+            </motion.p>
+          )}
+          
           <motion.p 
             className="text-sm text-gray-400 mb-12"
             initial={{ opacity: 0 }}
