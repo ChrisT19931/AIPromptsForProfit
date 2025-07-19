@@ -113,7 +113,7 @@ export default function Footer() {
               </a>
             </motion.span>
             <motion.span whileHover={{ scale: 1.05 }}>
-              <a href="https://www.ventarowear.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+              <a href="https://ventarowear.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
                 Ventaro Wear - Hyped Clothing
               </a>
             </motion.span>
