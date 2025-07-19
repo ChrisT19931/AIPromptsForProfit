@@ -58,8 +58,10 @@ export async function middleware(request: NextRequest) {
         limit = 5; // Sensitive operations: 5 requests per minute
       }
 
-      await limiter.check(response, limit, ip + pathname);
-    } catch {
+      await limiter.check(response, limit, ip);
+      console.log(`Rate limit check for IP: ${ip}, Path: ${pathname}, Limit: ${limit}`);
+    } catch (error) {
+      console.error(`Rate limit error for IP: ${ip}, Path: ${pathname}:`, error);
       return new NextResponse(
         JSON.stringify({ 
           error: 'Rate limit exceeded. Please try again later.',
@@ -88,7 +90,7 @@ export async function middleware(request: NextRequest) {
     if (!skipCSRF) {
       const csrfToken = request.headers.get('x-csrf-token');
       try {
-        const isValidCSRF = await validateCSRFToken(csrfToken, request);
+        const isValidCSRF = await validateCSRFToken(csrfToken);
         
         if (!isValidCSRF) {
           return new NextResponse(

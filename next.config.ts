@@ -56,31 +56,14 @@ const nextConfig: NextConfig = {
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;"
   },
   
+  serverExternalPackages: ['bcryptjs'],
+
   // Experimental features for security
   experimental: {
-    serverComponentsExternalPackages: ['bcryptjs'],
     optimizePackageImports: ['bcryptjs', 'jsonwebtoken']
   },
   
-  // Webpack configuration for security
-  webpack: (config, { dev, isServer }) => {
-    // Security-related webpack configurations
-    if (!dev && !isServer) {
-      // Remove console logs in production client-side
-      config.optimization.minimizer.push(
-        new (require('terser-webpack-plugin'))({
-          terserOptions: {
-            compress: {
-              drop_console: true,
-              drop_debugger: true
-            }
-          }
-        })
-      );
-    }
-    
-    return config;
-  }
+
 };
 
 export default nextConfig;
