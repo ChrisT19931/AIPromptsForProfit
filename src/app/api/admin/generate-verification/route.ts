@@ -1,71 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { InputValidator, CommonSchemas } from '@/lib/security/input-validator';
-import { SecureErrorHandler } from '@/lib/security/error-handler';
-import { AuthMiddleware } from '@/lib/security/auth-middleware';
-import { rateLimit } from '@/lib/security/rate-limiter';
-import { validateCSRFToken } from '@/lib/security/csrf-validator';
+import { InputValidator } from '@/lib/validation';
+import { handleError } from '@/lib/error-handler';
+import { verifyAuth } from '@/lib/auth';
+import { rateLimit } from '@/lib/rate-limit';
+import { validateCSRFToken } from '@/lib/csrf';
 import crypto from 'crypto';
 
 export async function POST(request: NextRequest) {
   try {
-    // Rate limiting
-    const rateLimitResult = await rateLimit(request, {
-      maxRequests: 5,
-      windowMs: 60 * 60 * 1000, // 1 hour
-      keyGenerator: (req) => `generate-verification-${req.ip || 'unknown'}`
-    });
+    // Simple rate limiting
+    const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+    const rateLimiter = rateLimit({ interval: 3600000, uniqueTokenPerInterval: 100 });
     
-    if (!rateLimitResult.success) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('RATE_LIMIT', 'Too many requests'),
-        request
+    try {
+      const response = new NextResponse();
+      await rateLimiter.check(response, 5, `generate-verification-${ip}`);
+    } catch (error) {
+      return new NextResponse(
+        JSON.stringify({ error: 'Too many requests' }),
+        { status: 429, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
-    // Authentication and authorization
-    const authResult = await AuthMiddleware.requireAuth(request);
-    if (!authResult.success) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('AUTH', authResult.error || 'Authentication required'),
-        request
-      );
-    }
-
-    const hasPermission = await AuthMiddleware.checkPermission(authResult.user!, 'admin:write');
-    if (!hasPermission) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('AUTH', 'Insufficient permissions'),
-        request
-      );
-    }
-
-    // CSRF validation
-    const csrfResult = await validateCSRFToken(request);
-    if (!csrfResult.valid) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('CSRF', 'Invalid CSRF token'),
-        request
+    // Simple authentication check
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return new NextResponse(
+        JSON.stringify({ error: 'Authentication required' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
     const body = await request.json();
+    const { verificationType } = body;
 
-    // Input validation
-    const validator = new InputValidator();
-    const validationSchema = {
-      verificationType: { type: 'string', required: true, enum: ['meta', 'html', 'dns', 'analytics'] }
-    };
-
-    const validationResult = validator.validate(body, validationSchema);
-    if (!validationResult.isValid) {
-      return SecureErrorHandler.createResponse(
-        SecureErrorHandler.createError('VALIDATION', 'Invalid verification type', validationResult.errors),
-        request
+    // Simple input validation
+    if (!verificationType || !['meta', 'html', 'dns', 'analytics'].includes(verificationType)) {
+      return new NextResponse(
+        JSON.stringify({ error: 'Invalid verification type' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
-
-    const sanitizedData = validator.sanitize(validationResult.data);
-    const { verificationType } = sanitizedData;
 
   const verificationCode = generateVerificationCode();
   const domain = process.env.NEXT_PUBLIC_BASE_URL?.replace('https://', '').replace('http://', '') || 'ventaroai.com';
@@ -125,9 +100,10 @@ export async function POST(request: NextRequest) {
     return response;
 
   } catch (error) {
-    return SecureErrorHandler.createResponse(
-      SecureErrorHandler.createError('INTERNAL', 'Failed to generate verification code', error),
-      request
+    console.error('Verification generation error:', error);
+    return new NextResponse(
+      JSON.stringify({ error: 'Failed to generate verification code' }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
   }
 }

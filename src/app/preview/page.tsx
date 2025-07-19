@@ -202,7 +202,7 @@ export default function Preview() {
               whileInView={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6 }}
             >
-              What You'll Get in the Full Collection
+              What You&apos;ll Get in the Full Collection
             </motion.h2>
             
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">

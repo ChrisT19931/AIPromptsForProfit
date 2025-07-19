@@ -92,7 +92,7 @@ function DownloadContent() {
                   Purchase AI Prompts - $10
                 </Link>
                 <div className="text-sm text-gray-500">
-                  After purchase, you'll be redirected here automatically
+                  After purchase, you&apos;ll be redirected here automatically
                 </div>
               </motion.div>
             </motion.div>
