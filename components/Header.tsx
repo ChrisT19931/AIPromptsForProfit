@@ -20,13 +20,13 @@ export default function Header() {
             whileHover={{ scale: 1.05 }}
           >
             <Link href="/" className="text-2xl font-bold text-gray-900 flex items-center">
-              <motion.span 
-                className="bg-gradient-to-r from-gray-700 to-gray-900 text-white px-2 py-1 rounded mr-2 text-sm"
+              <motion.img 
+                src="/assets/vai-logo.svg"
+                alt="VAI Logo"
+                className="w-12 h-12 mr-3"
                 whileHover={{ scale: 1.1, rotate: 5 }}
                 transition={{ type: "spring", stiffness: 300 }}
-              >
-                VA
-              </motion.span>
+              />
               Ventaro AI - AI Prompts For Profit
             </Link>
           </motion.div>
@@ -63,32 +63,7 @@ export default function Header() {
                 </Link>
               </motion.div>
             </motion.nav>
-            
-            {/* Login Button - Top Right */}
-            <motion.div 
-              className="ml-auto"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-            >
-              <motion.div 
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Link 
-                  href="/login" 
-                  className="bg-gradient-to-r from-gray-300 to-gray-400 text-black font-bold px-6 py-2 rounded-lg hover:from-gray-200 hover:to-gray-300 transition-all shadow-lg relative overflow-hidden group"
-                >
-                  <span className="relative z-10">🔐 Login</span>
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12"
-                    initial={{ x: '-100%' }}
-                    whileHover={{ x: '200%' }}
-                    transition={{ duration: 0.6 }}
-                  />
-                </Link>
-              </motion.div>
-            </motion.div>
+
           </div>
         </div>
       </div>

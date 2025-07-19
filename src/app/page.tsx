@@ -1,7 +1,6 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useState } from 'react';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import BuyButton from '../../components/BuyButton';
@@ -10,41 +9,6 @@ import { faqs } from '../../data/faq';
 import Head from 'next/head';
 
 export default function Home() {
-  const [subscribeEmail, setSubscribeEmail] = useState('');
-  const [subscribeStatus, setSubscribeStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [subscribeMessage, setSubscribeMessage] = useState('');
-
-  const handleSubscribe = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!subscribeEmail) return;
-    
-    setSubscribeStatus('loading');
-    setSubscribeMessage('');
-    
-    try {
-      const response = await fetch('/api/subscribe', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: subscribeEmail }),
-      });
-      
-      const data = await response.json();
-      
-      if (response.ok) {
-        setSubscribeStatus('success');
-        setSubscribeMessage('Thanks for subscribing! You&apos;ll receive AI updates soon.');
-        setSubscribeEmail('');
-      } else {
-        setSubscribeStatus('error');
-        setSubscribeMessage(data.error || 'Failed to subscribe. Please try again.');
-      }
-    } catch (error) {
-      setSubscribeStatus('error');
-      setSubscribeMessage('An error occurred. Please try again later.');
-    }
-  };
 
   const productStructuredData = {
     "@context": "https://schema.org",
@@ -383,97 +347,132 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Subscription Section */}
-      <section className="py-24 px-6 bg-gradient-to-br from-gray-900 to-black text-white relative overflow-hidden">
-        <div className="max-w-4xl mx-auto text-center relative z-10">
+      {/* Enhanced Features Showcase */}
+      <section className="py-24 px-6 bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white relative overflow-hidden">
+        {/* Advanced 3D Background Elements */}
+        <div className="absolute inset-0">
+          <motion.div 
+            className="absolute top-10 left-1/4 w-64 h-64 bg-gradient-to-r from-gray-400/20 to-gray-600/20 rounded-full blur-3xl"
+            animate={{
+              x: [0, 150, -100, 0],
+              y: [0, -80, 120, 0],
+              scale: [1, 1.4, 0.8, 1],
+              opacity: [0.3, 0.7, 0.4, 0.3]
+            }}
+            transition={{
+              duration: 12,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+          <motion.div 
+            className="absolute bottom-20 right-1/4 w-48 h-48 bg-gradient-to-l from-gray-500/15 to-gray-700/15 rounded-full blur-2xl"
+            animate={{
+              x: [0, -120, 80, 0],
+              y: [0, 100, -60, 0],
+              scale: [1, 0.7, 1.3, 1],
+              opacity: [0.4, 0.8, 0.5, 0.4]
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 2
+            }}
+          />
+          <motion.div 
+            className="absolute top-1/2 left-1/2 w-32 h-32 bg-gradient-to-br from-gray-300/10 to-gray-600/10 rounded-full blur-xl"
+            animate={{
+              rotate: [0, 360],
+              scale: [1, 1.2, 1],
+              opacity: [0.2, 0.6, 0.2]
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+          />
+        </div>
+        
+        <div className="max-w-6xl mx-auto text-center relative z-10">
           <motion.h2 
-            className="text-4xl md:text-5xl font-bold mb-6"
-            initial={{ opacity: 0, scale: 0.8 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6 }}
+            className="text-5xl md:text-7xl font-black mb-8"
+            initial={{ opacity: 0, scale: 0.8, rotateX: -15 }}
+            whileInView={{ opacity: 1, scale: 1, rotateX: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            whileHover={{ 
+              scale: 1.05, 
+              rotateX: 5,
+              rotateY: 5,
+              textShadow: '0 0 50px rgba(255,255,255,0.3)'
+            }}
+            style={{
+              background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 30%, #e2e8f0 70%, #cbd5e1 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              textShadow: '0 8px 16px rgba(0,0,0,0.4)',
+              transformStyle: 'preserve-3d'
+            }}
+          >
+            ELITE AI ARSENAL
+          </motion.h2>
+          
+          <motion.p 
+            className="text-2xl mb-12 text-gray-300 max-w-4xl mx-auto leading-relaxed"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
             viewport={{ once: true }}
             style={{
               textShadow: '0 4px 8px rgba(0,0,0,0.3)'
             }}
           >
-            🚀 Stay Ahead of the AI Revolution
-          </motion.h2>
-          <motion.p 
-            className="text-xl mb-8 text-gray-300"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            viewport={{ once: true }}
-          >
-            Subscribe to Ventaro AI for exclusive access to cutting-edge AI tools, prompts, and business strategies
+            Transform any AI model into your personal profit machine. These carefully crafted prompts are designed to help you maximize your earning potential.
           </motion.p>
-          <form onSubmit={handleSubscribe}>
-            <motion.div 
-              className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto mb-6"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              viewport={{ once: true }}
-            >
-              <input 
-                type="email" 
-                placeholder="Enter your email for AI updates"
-                className="flex-1 px-6 py-4 rounded-lg text-black font-medium focus:outline-none focus:ring-2 focus:ring-gray-400 shadow-lg border border-gray-200"
-                value={subscribeEmail}
-                onChange={(e) => setSubscribeEmail(e.target.value)}
-                required
-              />
-              <motion.button 
-                type="submit"
-                className="bg-gradient-to-r from-gray-300 to-gray-500 text-black font-bold px-8 py-4 rounded-lg hover:from-gray-200 hover:to-gray-400 transition-all shadow-lg relative overflow-hidden group"
-                whileHover={{ scale: 1.05, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.2)' }}
-                whileTap={{ scale: 0.95 }}
-                disabled={subscribeStatus === 'loading'}
+          
+          {/* Enhanced Stats Grid */}
+          <div className="grid md:grid-cols-3 gap-8 mb-16">
+            {[
+              { number: "30+", label: "Proven Prompts", icon: "🎯" },
+              { number: "AI", label: "Powered Tools", icon: "💰" },
+              { number: "24/7", label: "Access Available", icon: "⭐" }
+            ].map((stat, index) => (
+              <motion.div
+                key={index}
+                className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm p-8 rounded-2xl border border-gray-700/50 group cursor-pointer"
+                initial={{ opacity: 0, y: 50, rotateX: -20 }}
+                whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.2 }}
+                whileHover={{ 
+                  y: -15, 
+                  rotateX: 10,
+                  rotateY: 5,
+                  scale: 1.05,
+                  boxShadow: "0 30px 60px -12px rgba(0, 0, 0, 0.4)"
+                }}
+                viewport={{ once: true }}
+                style={{ transformStyle: "preserve-3d" }}
               >
-                <span className="relative z-10">
-                  {subscribeStatus === 'loading' ? 'Subscribing...' : 'Subscribe'}
-                </span>
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12"
-                  initial={{ x: '-100%' }}
-                  whileHover={{ x: '200%' }}
+                <motion.div 
+                  className="text-6xl mb-4"
+                  whileHover={{ scale: 1.2, rotateY: 180 }}
                   transition={{ duration: 0.6 }}
-                />
-              </motion.button>
-            </motion.div>
-          </form>
-          
-          {subscribeStatus === 'success' && (
-            <motion.p 
-              className="text-sm text-green-400 mb-4"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-            >
-              {subscribeMessage}
-            </motion.p>
-          )}
-          
-          {subscribeStatus === 'error' && (
-            <motion.p 
-              className="text-sm text-red-400 mb-4"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-            >
-              {subscribeMessage}
-            </motion.p>
-          )}
-          
-          <motion.p 
-            className="text-sm text-gray-400 mb-12"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-            viewport={{ once: true }}
-          >
-            No spam, just AI gold 💎
-          </motion.p>
+                >
+                  {stat.icon}
+                </motion.div>
+                <motion.div 
+                  className="text-4xl font-black mb-2 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
+                  whileHover={{ scale: 1.1 }}
+                >
+                  {stat.number}
+                </motion.div>
+                <p className="text-gray-400 text-lg font-medium">{stat.label}</p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 

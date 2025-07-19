@@ -9,15 +9,13 @@ import { useSearchParams } from 'next/navigation';
 
 function DownloadContent() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userEmail, setUserEmail] = useState('');
-  const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [sessionValid, setSessionValid] = useState(false);
   const searchParams = useSearchParams();
 
   useEffect(() => {
     const verifyAccess = async () => {
-      // First check for Stripe session ID (payment-based access)
+      // Check for Stripe session ID (payment-based access)
       const sessionId = searchParams.get('session_id');
       
       if (sessionId) {
@@ -28,23 +26,12 @@ function DownloadContent() {
           if (data.valid) {
             setSessionValid(true);
             setIsAuthenticated(true);
-            setUserEmail(data.customerEmail || 'Valued Customer');
             setIsLoading(false);
             return;
           }
         } catch (error) {
           console.error('Error verifying session:', error);
         }
-      }
-      
-      // Fallback to email-based authentication for existing users
-      const email = localStorage.getItem('userEmail');
-      const adminStatus = localStorage.getItem('isAdmin') === 'true';
-      
-      if (email) {
-        setUserEmail(email);
-        setIsAdmin(adminStatus);
-        setIsAuthenticated(true);
       }
       
       setIsLoading(false);
@@ -105,10 +92,7 @@ function DownloadContent() {
                   Purchase AI Prompts - $10
                 </Link>
                 <div className="text-sm text-gray-500">
-                  Already purchased?{' '}
-                  <Link href="/login" className="text-blue-600 hover:text-blue-800 underline">
-                    Login with your email
-                  </Link>
+                  After purchase, you'll be redirected here automatically
                 </div>
               </motion.div>
             </motion.div>
@@ -156,7 +140,7 @@ function DownloadContent() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.4 }}
               >
-                {isAdmin ? 'Admin Access' : sessionValid ? 'Payment Successful!' : 'Welcome Back!'}
+                Payment Successful!
               </motion.h1>
               <motion.p 
                 className="text-lg text-black font-bold"
@@ -164,12 +148,7 @@ function DownloadContent() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.5 }}
               >
-                {isAdmin 
-                  ? 'You have admin access to all AI prompts.' 
-                  : sessionValid 
-                  ? 'Thank you for your purchase! Your AI prompts are ready to download.' 
-                  : `Welcome back, ${userEmail}! Your AI prompts are ready to download.`
-                }
+                Thank you for your purchase! Your AI prompts are ready to download.
               </motion.p>
             </div>
 
@@ -189,41 +168,17 @@ function DownloadContent() {
                 Download Your 30 AI Prompts
               </motion.h2>
               <motion.button 
-                className="bg-gray-400 text-black font-bold py-3 px-8 rounded-lg text-lg hover:bg-gray-300 transition-colors mb-4"
+                className="bg-blue-600 text-white font-bold py-4 px-12 rounded-lg text-xl hover:bg-blue-700 transition-colors shadow-lg"
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6, delay: 0.8 }}
-                whileHover={{ scale: 1.05, y: -2 }}
+                whileHover={{ scale: 1.05, y: -2, boxShadow: "0 10px 25px rgba(59, 130, 246, 0.3)" }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => {
                   window.open('/api/generate-pdf', '_blank');
                 }}
               >
-                📥 Download PDF (30 Prompts)
-              </motion.button>
-              <motion.button 
-                className="bg-blue-500 text-white font-bold py-2 px-6 rounded-lg text-sm hover:bg-blue-600 transition-colors ml-4"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, delay: 0.9 }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => {
-                  const email = prompt('Enter your email to receive download link:');
-                  if (email) {
-                    fetch('/api/send-download-email', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ email })
-                    }).then(() => {
-                      alert('Download link sent to your email!');
-                    }).catch(() => {
-                      alert('Failed to send email. Please contact support.');
-                    });
-                  }
-                }}
-              >
-                📧 Email Download Link
+                📥 Download Your AI Prompts (PDF)
               </motion.button>
               <motion.p 
                 className="text-sm text-gray-600 mt-4"

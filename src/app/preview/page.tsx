@@ -188,6 +188,160 @@ export default function Preview() {
             ))}
           </div>
 
+          {/* What You'll Get Section */}
+          <motion.div 
+            className="mt-20 bg-gradient-to-br from-gray-50 to-white p-12 rounded-xl border-2 border-gray-200"
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <motion.h2 
+              className="text-4xl font-bold text-center mb-12 text-gray-900"
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6 }}
+            >
+              What You'll Get in the Full Collection
+            </motion.h2>
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[
+                {
+                  icon: "💰",
+                  title: "Sales & Marketing Prompts",
+                  description: "High-converting email sequences, product descriptions, and sales copy that turn prospects into customers",
+                  examples: ["Email marketing campaigns", "Product launch sequences", "Sales page copy"]
+                },
+                {
+                  icon: "🚀",
+                  title: "Content Creation Arsenal",
+                  description: "Viral social media content, YouTube scripts, and blog posts that engage and convert audiences",
+                  examples: ["YouTube video scripts", "Instagram captions", "Blog post outlines"]
+                },
+                {
+                  icon: "💼",
+                  title: "Freelancing Success Kit",
+                  description: "Winning proposals, client communication templates, and project delivery frameworks",
+                  examples: ["Upwork proposals", "Client onboarding", "Project scopes"]
+                },
+                {
+                  icon: "🎯",
+                  title: "E-commerce Optimization",
+                  description: "Product research, listing optimization, and customer service automation for online stores",
+                  examples: ["Amazon listings", "Shopify descriptions", "Customer support"]
+                },
+                {
+                  icon: "📊",
+                  title: "Business Strategy Tools",
+                  description: "Market analysis, competitor research, and business plan development prompts",
+                  examples: ["Market research", "SWOT analysis", "Business plans"]
+                },
+                {
+                  icon: "🔥",
+                  title: "Lead Generation Machines",
+                  description: "Cold outreach templates, networking scripts, and lead qualification frameworks",
+                  examples: ["Cold emails", "LinkedIn outreach", "Lead magnets"]
+                }
+              ].map((category, index) => (
+                <motion.div
+                  key={index}
+                  className="bg-white p-6 rounded-lg shadow-lg border border-gray-200 group hover:shadow-xl transition-all duration-300"
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  whileHover={{ y: -5, scale: 1.02 }}
+                  viewport={{ once: true }}
+                >
+                  <motion.div 
+                    className="text-4xl mb-4"
+                    whileHover={{ scale: 1.2, rotate: 10 }}
+                  >
+                    {category.icon}
+                  </motion.div>
+                  <h3 className="text-xl font-bold mb-3 text-gray-900 group-hover:text-gray-700 transition-colors">
+                    {category.title}
+                  </h3>
+                  <p className="text-gray-600 mb-4 group-hover:text-gray-700 transition-colors">
+                    {category.description}
+                  </p>
+                  <div className="space-y-2">
+                    {category.examples.map((example, i) => (
+                      <motion.div 
+                        key={i}
+                        className="flex items-center text-sm text-gray-500"
+                        initial={{ opacity: 0, x: -10 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.4, delay: index * 0.1 + i * 0.1 }}
+                      >
+                        <span className="w-2 h-2 bg-gray-400 rounded-full mr-2"></span>
+                        {example}
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Value Proposition */}
+          <motion.div 
+            className="mt-16 bg-gradient-to-r from-gray-100 to-gray-200 p-10 rounded-xl"
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <div className="text-center">
+              <motion.h3 
+                className="text-3xl font-bold mb-6 text-gray-900"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                Why These Prompts Are Different
+              </motion.h3>
+              
+              <div className="grid md:grid-cols-3 gap-8 mt-8">
+                {[
+                  {
+                    icon: "⚡",
+                    title: "Instant Results",
+                    description: "Copy, paste, and start earning. No learning curve required."
+                  },
+                  {
+                    icon: "🎯",
+                    title: "Proven & Tested",
+                    description: "Each prompt has been refined through real-world application."
+                  },
+                  {
+                    icon: "🔄",
+                    title: "Reusable Forever",
+                    description: "Use them unlimited times across different projects and clients."
+                  }
+                ].map((benefit, index) => (
+                  <motion.div
+                    key={index}
+                    className="text-center"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: index * 0.2 }}
+                    viewport={{ once: true }}
+                  >
+                    <motion.div 
+                      className="text-5xl mb-4"
+                      whileHover={{ scale: 1.2, rotate: 5 }}
+                    >
+                      {benefit.icon}
+                    </motion.div>
+                    <h4 className="text-xl font-bold mb-2 text-gray-900">{benefit.title}</h4>
+                    <p className="text-gray-600">{benefit.description}</p>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+
           {/* CTA */}
           <motion.div 
             className="text-center mt-16 bg-gradient-to-br from-black to-gray-900 text-white p-12 rounded-xl relative overflow-hidden"
