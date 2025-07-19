@@ -4,12 +4,12 @@ import { handleError } from '@/lib/error-handler';
 import { verifyAuth } from '@/lib/auth';
 import { rateLimit } from '@/lib/rate-limit';
 import { validateCSRFToken } from '@/lib/csrf';
-import crypto from 'crypto';
+// Using Web Crypto API instead of Node.js crypto module
 
 export async function POST(request: NextRequest) {
   try {
     // Simple rate limiting
-    const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+    const ip = request.headers.get('x-forwarded-for') || 'unknown';
     const rateLimiter = rateLimit({ interval: 3600000, uniqueTokenPerInterval: 100 });
     
     try {

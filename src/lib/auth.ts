@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import crypto from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
+// Using Web Crypto API instead of Node.js crypto module
 
 // Environment variables with fallbacks (should be set in production)
 const JWT_SECRET = process.env.JWT_SECRET || 'change-this-in-production-very-long-secret-key';
@@ -140,7 +140,8 @@ export class TokenManager {
    * Generate access token
    */
   static generateAccessToken(user: User): string {
-    const sessionId = crypto.randomUUID();
+    // Generate UUID using Web Crypto API
+    const sessionId = self.crypto.randomUUID();
     const payload: Omit<SessionData, 'iat' | 'exp'> = {
       userId: user.id,
       username: user.username,
@@ -160,7 +161,8 @@ export class TokenManager {
    * Generate refresh token
    */
   static generateRefreshToken(userId: string, sessionId: string): string {
-    const tokenFamily = crypto.randomUUID();
+    // Generate UUID using Web Crypto API
+    const tokenFamily = self.crypto.randomUUID();
     const payload: RefreshTokenData = {
       userId,
       sessionId,

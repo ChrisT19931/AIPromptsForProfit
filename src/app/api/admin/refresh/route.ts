@@ -27,7 +27,7 @@ function checkRefreshRateLimit(ip: string): boolean {
 }
 
 export const POST = withErrorHandler(async (request: NextRequest) => {
-  const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+  const ip = request.headers.get('x-forwarded-for') || 'unknown';
   
   // Check rate limiting
   if (!checkRefreshRateLimit(ip)) {

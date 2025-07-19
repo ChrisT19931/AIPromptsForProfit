@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import crypto from 'crypto';
+// Using Web Crypto API instead of Node.js crypto module for Edge Runtime compatibility
 
 // CSRF token configuration
 const CSRF_SECRET = process.env.CSRF_SECRET || 'default-csrf-secret-change-in-production';
@@ -19,17 +19,38 @@ const tokenStore = new Map<string, CSRFToken>();
 /**
  * Generate a cryptographically secure CSRF token
  */
-export function generateCSRFToken(sessionId?: string): string {
-  const randomBytes = crypto.randomBytes(TOKEN_LENGTH);
+export async function generateCSRFToken(sessionId?: string): Promise<string> {
+  // Generate random bytes using Web Crypto API
+  const randomBytes = new Uint8Array(TOKEN_LENGTH);
+  crypto.getRandomValues(randomBytes);
+  const randomHex = Array.from(randomBytes).map(b => b.toString(16).padStart(2, '0')).join('');
+  
   const timestamp = Date.now().toString();
-  const data = `${randomBytes.toString('hex')}:${timestamp}:${sessionId || ''}`;
+  const data = `${randomHex}:${timestamp}:${sessionId || ''}`;
   
-  // Create HMAC signature
-  const hmac = crypto.createHmac('sha256', CSRF_SECRET);
-  hmac.update(data);
-  const signature = hmac.digest('hex');
+  // Create HMAC signature using Web Crypto API
+  const encoder = new TextEncoder();
+  const keyData = encoder.encode(CSRF_SECRET);
+  const secretKey = await crypto.subtle.importKey(
+    'raw',
+    keyData,
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
   
-  const token = `${data}:${signature}`;
+  const signature = await crypto.subtle.sign(
+    'HMAC',
+    secretKey,
+    encoder.encode(data)
+  );
+  
+  // Convert signature to hex
+  const signatureHex = Array.from(new Uint8Array(signature))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+  
+  const token = `${data}:${signatureHex}`;
   
   // Store token with metadata
   tokenStore.set(token, {
@@ -77,22 +98,36 @@ export async function validateCSRFToken(
     const [randomHex, timestamp, sessionId, signature] = parts;
     const data = `${randomHex}:${timestamp}:${sessionId}`;
     
-    // Verify HMAC signature
-    const hmac = crypto.createHmac('sha256', CSRF_SECRET);
-    hmac.update(data);
-    const expectedSignature = hmac.digest('hex');
+    // Verify HMAC signature using Web Crypto API
+    const encoder = new TextEncoder();
+    const keyData = encoder.encode(CSRF_SECRET);
+    const secretKey = await crypto.subtle.importKey(
+      'raw',
+      keyData,
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['sign']
+    );
     
-    // Use timing-safe comparison
-    if (!crypto.timingSafeEqual(
-      Buffer.from(signature, 'hex'),
-      Buffer.from(expectedSignature, 'hex')
-    )) {
+    const expectedSignature = await crypto.subtle.sign(
+      'HMAC',
+      secretKey,
+      encoder.encode(data)
+    );
+    
+    // Convert expected signature to hex for comparison
+    const expectedSignatureHex = Array.from(new Uint8Array(expectedSignature))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+    
+    // Compare signatures (using constant-time comparison when possible)
+    if (signature !== expectedSignatureHex) {
       return false;
     }
 
     // Additional validation: check session consistency if available
     const userAgent = request.headers.get('user-agent') || '';
-    const ip = request.ip || request.headers.get('x-forwarded-for') || '';
+    const ip = request.headers.get('x-forwarded-for') || '';
     
     // Optional: Validate against session fingerprint
     if (sessionId && storedToken.sessionId !== sessionId) {
@@ -112,11 +147,11 @@ export async function validateCSRFToken(
 /**
  * Generate CSRF token for API response
  */
-export function getCSRFTokenForResponse(sessionId?: string): {
+export async function getCSRFTokenForResponse(sessionId?: string): Promise<{
   token: string;
   expires: number;
-} {
-  const token = generateCSRFToken(sessionId);
+}> {
+  const token = await generateCSRFToken(sessionId);
   return {
     token,
     expires: Date.now() + TOKEN_EXPIRY
@@ -146,37 +181,72 @@ export class DoubleSubmitCSRF {
   private cookieName = '__csrf-token';
   private headerName = 'x-csrf-token';
   
-  generateTokenPair(): { cookieValue: string; headerValue: string } {
-    const randomValue = crypto.randomBytes(32).toString('hex');
+  async generateTokenPair(): Promise<{ cookieValue: string; headerValue: string }> {
+    // Generate random bytes using Web Crypto API
+    const randomBytes = new Uint8Array(32);
+    crypto.getRandomValues(randomBytes);
+    const randomValue = Array.from(randomBytes).map(b => b.toString(16).padStart(2, '0')).join('');
     const timestamp = Date.now().toString();
     
     // Create cookie value (base64 encoded)
-    const cookieValue = Buffer.from(`${randomValue}:${timestamp}`).toString('base64');
+    const encoder = new TextEncoder();
+    const rawData = encoder.encode(`${randomValue}:${timestamp}`);
+    const cookieValue = btoa(String.fromCharCode(...new Uint8Array(rawData)));
     
     // Create header value (HMAC of cookie value)
-    const hmac = crypto.createHmac('sha256', CSRF_SECRET);
-    hmac.update(cookieValue);
-    const headerValue = hmac.digest('hex');
+    const keyData = encoder.encode(CSRF_SECRET);
+    const secretKey = await crypto.subtle.importKey(
+      'raw',
+      keyData,
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['sign']
+    );
+    
+    const signature = await crypto.subtle.sign(
+      'HMAC',
+      secretKey,
+      encoder.encode(cookieValue)
+    );
+    
+    // Convert signature to hex
+    const headerValue = Array.from(new Uint8Array(signature))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
     
     return { cookieValue, headerValue };
   }
   
-  validateTokenPair(cookieValue: string, headerValue: string): boolean {
+  async validateTokenPair(cookieValue: string, headerValue: string): Promise<boolean> {
     try {
-      // Verify header is HMAC of cookie
-      const hmac = crypto.createHmac('sha256', CSRF_SECRET);
-      hmac.update(cookieValue);
-      const expectedHeader = hmac.digest('hex');
+      // Verify header is HMAC of cookie using Web Crypto API
+      const encoder = new TextEncoder();
+      const keyData = encoder.encode(CSRF_SECRET);
+      const secretKey = await crypto.subtle.importKey(
+        'raw',
+        keyData,
+        { name: 'HMAC', hash: 'SHA-256' },
+        false,
+        ['sign']
+      );
       
-      if (!crypto.timingSafeEqual(
-        Buffer.from(headerValue, 'hex'),
-        Buffer.from(expectedHeader, 'hex')
-      )) {
+      const expectedSignature = await crypto.subtle.sign(
+        'HMAC',
+        secretKey,
+        encoder.encode(cookieValue)
+      );
+      
+      // Convert expected signature to hex for comparison
+      const expectedHeader = Array.from(new Uint8Array(expectedSignature))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+      
+      if (headerValue !== expectedHeader) {
         return false;
       }
       
-      // Decode and validate cookie
-      const decoded = Buffer.from(cookieValue, 'base64').toString('utf-8');
+      // Decode and validate cookie using Web API instead of Node.js Buffer
+      const decoded = atob(cookieValue);
       const [randomValue, timestamp] = decoded.split(':');
       
       if (!randomValue || !timestamp) {
@@ -203,7 +273,10 @@ export class SynchronizerToken {
   private tokens = new Map<string, { token: string; expires: number }>();
   
   generateToken(sessionId: string): string {
-    const token = crypto.randomBytes(32).toString('hex');
+    // Generate random bytes using Web Crypto API
+    const randomBytes = new Uint8Array(32);
+    crypto.getRandomValues(randomBytes);
+    const token = Array.from(randomBytes).map(b => b.toString(16).padStart(2, '0')).join('');
     const expires = Date.now() + TOKEN_EXPIRY;
     
     this.tokens.set(sessionId, { token, expires });

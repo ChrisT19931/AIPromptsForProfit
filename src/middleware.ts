@@ -12,7 +12,7 @@ export async function middleware(request: NextRequest) {
   const response = NextResponse.next();
   const { pathname } = request.nextUrl;
   const method = request.method;
-  const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+  const ip = request.headers.get('x-forwarded-for') || 'unknown';
 
   // Security Headers
   response.headers.set('X-Frame-Options', 'DENY');
@@ -87,16 +87,30 @@ export async function middleware(request: NextRequest) {
 
     if (!skipCSRF) {
       const csrfToken = request.headers.get('x-csrf-token');
-      const isValidCSRF = await validateCSRFToken(csrfToken, request);
-      
-      if (!isValidCSRF) {
+      try {
+        const isValidCSRF = await validateCSRFToken(csrfToken, request);
+        
+        if (!isValidCSRF) {
+          return new NextResponse(
+            JSON.stringify({ 
+              error: 'Invalid CSRF token',
+              code: 'CSRF_TOKEN_INVALID'
+            }),
+            { 
+              status: 403,
+              headers: { 'Content-Type': 'application/json' }
+            }
+          );
+        }
+      } catch (error) {
+        console.error('CSRF validation error:', error);
         return new NextResponse(
           JSON.stringify({ 
-            error: 'Invalid CSRF token',
-            code: 'CSRF_TOKEN_INVALID'
+            error: 'CSRF validation failed',
+            code: 'CSRF_VALIDATION_ERROR'
           }),
           { 
-            status: 403,
+            status: 500,
             headers: { 'Content-Type': 'application/json' }
           }
         );

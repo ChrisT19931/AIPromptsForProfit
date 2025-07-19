@@ -39,7 +39,7 @@ interface AnalyticsData {
 export async function GET(request: NextRequest) {
   try {
     // Simple rate limiting
-    const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+    const ip = request.headers.get('x-forwarded-for') || 'unknown';
     const rateLimiter = rateLimit({ interval: 60000, uniqueTokenPerInterval: 100 });
     
     try {
@@ -213,7 +213,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // Simple rate limiting
-    const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+    const ip = request.headers.get('x-forwarded-for') || 'unknown';
     const rateLimiter = rateLimit({ interval: 60000, uniqueTokenPerInterval: 100 });
     
     try {
@@ -368,7 +368,7 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     // Simple rate limiting
-    const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+    const ip = request.headers.get('x-forwarded-for') || 'unknown';
     const rateLimiter = rateLimit({ interval: 60000, uniqueTokenPerInterval: 100 });
     
     try {

@@ -41,7 +41,7 @@ function resetLoginAttempts(ip: string): void {
 
 export async function POST(request: NextRequest) {
   try {
-  const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+  const ip = request.headers.get('x-forwarded-for') || 'unknown';
   
     // Check rate limiting
     const rateLimitResult = checkLoginRateLimit(ip);

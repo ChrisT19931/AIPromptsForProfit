@@ -36,7 +36,7 @@ function isValidUrl(url: string): boolean {
 
 export const POST = withErrorHandler(async (request: NextRequest) => {
   // Rate limiting
-  const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+  const ip = request.headers.get('x-forwarded-for') || 'unknown';
   if (!checkRateLimit(ip)) {
     const errorDetails = SecureErrorHandler.handleError(
       new Error('Rate limit exceeded'),
