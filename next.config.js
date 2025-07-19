@@ -1,8 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    serverExternalPackages: ['bcryptjs']
-  },
+  serverExternalPackages: ['bcryptjs'],
   webpack: (config, { isServer }) => {
     if (isServer) {
       config.externals.push('bcryptjs');
