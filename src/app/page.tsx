@@ -234,7 +234,7 @@ export default function Home() {
               textShadow: '0 2px 4px rgba(0,0,0,0.3)'
             }}
           >
-            Transform ChatGPT, Claude, Gemini, Grok & more into your personal money-making machine with battle-tested prompts for sales, marketing, freelancing, and e-commerce.
+            Transform ChatGPT, Claude, Gemini, Grok & more into your personal money-making machine with battle-tested prompts for creating an online business in sales/marketing/freelance/ecommerce/etc.
           </motion.p>
           <motion.div 
             className="flex flex-col sm:flex-row gap-6 justify-center items-center"
@@ -284,7 +284,7 @@ export default function Home() {
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            Make Money with ChatGPT in Every Area
+Build Your Online Business Empire with AI
             <motion.div 
               className="w-48 h-1 bg-gradient-to-r from-gray-300 to-gray-500 mx-auto mt-4 rounded-full"
               initial={{ width: 0, opacity: 0 }}
@@ -297,20 +297,20 @@ export default function Home() {
             {[
               {
                 icon: "💰",
-                title: "Sales & Marketing",
-                description: "Generate high-converting sales emails, product descriptions, and marketing copy that turns prospects into paying customers.",
+                title: "Online Business Creation",
+                description: "Launch profitable online businesses with AI-powered automation, from dropshipping empires to digital product sales that generate consistent revenue.",
                 delay: 0
               },
               {
                 icon: "🚀",
-                title: "Content Creation",
-                description: "Create viral social media content, YouTube scripts, and blog posts that engage audiences and drive traffic.",
+                title: "Digital Product Empire",
+                description: "Create and sell AI-generated digital products, from eBooks to SaaS tools, building passive income streams that work 24/7.",
                 delay: 0.2
               },
               {
                 icon: "💼",
-                title: "Freelancing",
-                description: "Win more clients with compelling proposals, deliver better work faster, and scale your freelance business.",
+                title: "Automated Business Systems",
+                description: "Build scalable online businesses with AI automation, from affiliate sites to membership platforms that generate recurring revenue.",
                 delay: 0.4
               }
             ].map((feature, index) => (

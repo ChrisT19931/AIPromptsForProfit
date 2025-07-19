@@ -209,39 +209,39 @@ export default function Preview() {
               {[
                 {
                   icon: "💰",
-                  title: "Sales & Marketing Prompts",
-                  description: "High-converting email sequences, product descriptions, and sales copy that turn prospects into customers",
-                  examples: ["Email marketing campaigns", "Product launch sequences", "Sales page copy"]
+                  title: "Automated Dropshipping Empire",
+                  description: "Complete blueprint to launch a fully automated dropshipping business generating $10K/month with AI-driven operations",
+                  examples: ["Niche selection strategies", "Supplier integration systems", "AI-powered ad campaigns"]
                 },
                 {
                   icon: "🚀",
-                  title: "Content Creation Arsenal",
-                  description: "Viral social media content, YouTube scripts, and blog posts that engage and convert audiences",
-                  examples: ["YouTube video scripts", "Instagram captions", "Blog post outlines"]
+                  title: "AI Art Business Blueprint",
+                  description: "Step-by-step system to create and sell AI-generated digital art and print-on-demand products for passive income",
+                  examples: ["AI art tool workflows", "Store setup guides", "Viral marketing strategies"]
                 },
                 {
                   icon: "💼",
-                  title: "Freelancing Success Kit",
-                  description: "Winning proposals, client communication templates, and project delivery frameworks",
-                  examples: ["Upwork proposals", "Client onboarding", "Project scopes"]
+                  title: "AI eBook Publishing Empire",
+                  description: "Complete system for creating, publishing, and selling AI-generated eBooks on Amazon KDP for consistent royalties",
+                  examples: ["Book generation prompts", "KDP optimization", "Launch marketing tactics"]
                 },
                 {
                   icon: "🎯",
-                  title: "E-commerce Optimization",
-                  description: "Product research, listing optimization, and customer service automation for online stores",
-                  examples: ["Amazon listings", "Shopify descriptions", "Customer support"]
+                  title: "Profitable AI SaaS Builder",
+                  description: "Complete blueprint for building and launching profitable SaaS tools using no-code/low-code and AI integrations",
+                  examples: ["MVP feature planning", "No-code development", "User acquisition strategies"]
                 },
                 {
                   icon: "📊",
-                  title: "Business Strategy Tools",
-                  description: "Market analysis, competitor research, and business plan development prompts",
-                  examples: ["Market research", "SWOT analysis", "Business plans"]
+                  title: "AI Notion Templates Business",
+                  description: "Step-by-step plan to create and sell AI-powered Notion templates and digital planners for recurring revenue",
+                  examples: ["Template creation workflows", "Store optimization", "Social media scaling"]
                 },
                 {
                   icon: "🔥",
-                  title: "Lead Generation Machines",
-                  description: "Cold outreach templates, networking scripts, and lead qualification frameworks",
-                  examples: ["Cold emails", "LinkedIn outreach", "Lead magnets"]
+                  title: "Bonus Business Accelerators",
+                  description: "Additional proven strategies for scaling your online business empire with advanced AI automation",
+                  examples: ["Traffic generation", "Conversion optimization", "Revenue scaling"]
                 }
               ].map((category, index) => (
                 <motion.div
@@ -306,18 +306,18 @@ export default function Preview() {
                 {[
                   {
                     icon: "⚡",
-                    title: "Instant Results",
-                    description: "Copy, paste, and start earning. No learning curve required."
+                    title: "Launch in 24-48 Hours",
+                    description: "Start your online business empire immediately with ready-to-use automation blueprints."
                   },
                   {
                     icon: "🎯",
-                    title: "Proven & Tested",
-                    description: "Each prompt has been refined through real-world application."
+                    title: "$10K+ Monthly Potential",
+                    description: "Each business model is designed to scale to 5-figure monthly revenue with proper execution."
                   },
                   {
                     icon: "🔄",
-                    title: "Reusable Forever",
-                    description: "Use them unlimited times across different projects and clients."
+                    title: "Multiple Revenue Streams",
+                    description: "Build diverse income sources from dropshipping, digital products, SaaS, and more."
                   }
                 ].map((benefit, index) => (
                   <motion.div
