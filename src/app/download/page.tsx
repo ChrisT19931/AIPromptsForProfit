@@ -78,7 +78,7 @@ export default function Download() {
                   Login to Access
                 </Link>
                 <div className="text-sm text-gray-500">
-                  Don't have the prompts yet?{' '}
+                  Don&apos;t have the prompts yet?{' '}
                   <Link href="/buy" className="text-blue-600 hover:text-blue-800 underline">
                     Purchase here
                   </Link>

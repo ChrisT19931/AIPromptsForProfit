@@ -98,9 +98,9 @@ export default function TermsOfService() {
               
               <h2 className="text-xl font-semibold mb-4">Support & Issues</h2>
               <div className="bg-green-50 border-l-4 border-green-400 p-4 mb-4">
-                <p className="font-semibold text-green-800">We're Here to Help!</p>
+                <p className="font-semibold text-green-800">We&apos;re Here to Help!</p>
                 <p className="text-green-700">
-                  While we don't offer refunds, we are committed to supporting our customers. If you 
+                  While we don&apos;t offer refunds, we are committed to supporting our customers. If you 
                   experience any technical issues with downloading your product or have questions about 
                   using the prompts, please contact us immediately at chris.t@ventarosales.com. 
                   We will work diligently to resolve any legitimate issues.

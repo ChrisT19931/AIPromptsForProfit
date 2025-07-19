@@ -62,7 +62,7 @@ export default function Buy() {
           "@type": "Person",
           "name": "Sarah M."
         },
-        "reviewBody": "These AI prompts transformed my freelancing business. I'm earning 3x more with ChatGPT now!"
+        "reviewBody": "These AI prompts transformed my freelancing business. I&apos;m earning 3x more with ChatGPT now!"
       }
     ]
   };
@@ -128,7 +128,7 @@ export default function Buy() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.3 }}
               >
-                You're one step away from unlocking 30 proven AI prompts
+                You&apos;re one step away from unlocking 30 proven AI prompts
               </motion.p>
             </motion.div>
             
@@ -173,14 +173,14 @@ export default function Buy() {
               </div>
             </motion.div>
 
-            {/* What's Included */}
+            {/* What&apos;s Included */}
             <motion.div 
               className="mb-8"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
             >
-              <h3 className="text-xl font-semibold mb-6 text-gray-900">What's Included:</h3>
+              <h3 className="text-xl font-semibold mb-6 text-gray-900">What&apos;s Included:</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {[
                   { icon: "🎯", title: "30 High-Converting AI Prompts", desc: "Battle-tested for maximum results" },

@@ -96,7 +96,7 @@ export default function Preview() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            See exactly what you'll get. These 5 samples are just the beginning...
+            See exactly what you&apos;ll get. These 5 samples are just the beginning...
           </motion.p>
         </div>
       </section>
@@ -228,7 +228,7 @@ export default function Preview() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
             >
-              These 5 samples are just 16% of what you'll get. Imagine having 30 proven prompts at your fingertips.
+              These 5 samples are just 16% of what you&apos;ll get. Imagine having 30 proven prompts at your fingertips.
             </motion.p>
             <motion.div
               initial={{ opacity: 0, y: 20 }}

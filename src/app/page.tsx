@@ -34,7 +34,7 @@ export default function Home() {
       
       if (response.ok) {
         setSubscribeStatus('success');
-        setSubscribeMessage('Thanks for subscribing! You\'ll receive AI updates soon.');
+        setSubscribeMessage('Thanks for subscribing! You&apos;ll receive AI updates soon.');
         setSubscribeEmail('');
       } else {
         setSubscribeStatus('error');
@@ -516,7 +516,7 @@ export default function Home() {
             transition={{ duration: 0.6, delay: 0.2 }}
             viewport={{ once: true }}
           >
-            These aren't just prompts - they're your shortcut to profitable AI automation.
+            These aren&apos;t just prompts - they&apos;re your shortcut to profitable AI automation.
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}

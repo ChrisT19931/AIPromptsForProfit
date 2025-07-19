@@ -141,7 +141,7 @@ export default function Login() {
               transition={{ duration: 0.6, delay: 0.6 }}
             >
               <p className="text-sm text-gray-600 mb-4">
-                Don't have the prompts yet?
+                Don&apos;t have the prompts yet?
               </p>
               <Link 
                 href="/buy"
