@@ -96,7 +96,7 @@ export default function Preview() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            See exactly what you&apos;ll get. These 5 samples are just the beginning...
+            See exactly what you&apos;ll get. These 5 sample AI prompts for online business creation are just the beginning...
           </motion.p>
         </div>
       </section>
@@ -299,7 +299,7 @@ export default function Preview() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
               >
-                Why These Prompts Are Different
+                Why These Business-Building Prompts Are Different
               </motion.h3>
               
               <div className="grid md:grid-cols-3 gap-8 mt-8">
@@ -374,7 +374,7 @@ export default function Preview() {
               whileInView={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              Ready to Unlock All 30 Prompts?
+              Ready to Unlock All 30 Business-Building Prompts?
             </motion.h2>
             <motion.p 
               className="text-xl mb-8 text-gray-300 relative z-10"
@@ -382,7 +382,7 @@ export default function Preview() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
             >
-              These 5 samples are just 16% of what you&apos;ll get. Imagine having 30 proven prompts at your fingertips.
+              These 5 samples are just 16% of what you&apos;ll get. Imagine having 30 proven AI prompts specifically designed for online business creation at your fingertips.
             </motion.p>
             <motion.div
               initial={{ opacity: 0, y: 20 }}

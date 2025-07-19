@@ -430,14 +430,14 @@ Build Your Online Business Empire with AI
               textShadow: '0 4px 8px rgba(0,0,0,0.3)'
             }}
           >
-            Transform any AI model into your personal profit machine. These carefully crafted prompts are designed to help you maximize your earning potential.
+            Transform any AI model into your personal business builder. These carefully crafted prompts are designed specifically to help you create profitable online businesses.
           </motion.p>
           
           {/* Enhanced Stats Grid */}
           <div className="grid md:grid-cols-3 gap-8 mb-16">
             {[
               { number: "30+", label: "Proven Prompts", icon: "🎯" },
-              { number: "AI", label: "Powered Tools", icon: "💰" },
+              { number: "100%", label: "AI Compatible", icon: "💰" },
               { number: "24/7", label: "Access Available", icon: "⭐" }
             ].map((stat, index) => (
               <motion.div
@@ -515,7 +515,7 @@ Build Your Online Business Empire with AI
             transition={{ duration: 0.6, delay: 0.2 }}
             viewport={{ once: true }}
           >
-            These aren&apos;t just prompts - they&apos;re your shortcut to profitable AI automation.
+            These aren&apos;t just prompts - they&apos;re your complete blueprint to building profitable online businesses with AI.
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
