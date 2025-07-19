@@ -1,30 +1,57 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { motion } from 'framer-motion';
 import Header from '../../../components/Header';
 import Footer from '../../../components/Footer';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
-export default function Download() {
+function DownloadContent() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userEmail, setUserEmail] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [sessionValid, setSessionValid] = useState(false);
+  const searchParams = useSearchParams();
 
   useEffect(() => {
-    // Check if user is authenticated
-    const email = localStorage.getItem('userEmail');
-    const adminStatus = localStorage.getItem('isAdmin') === 'true';
+    const verifyAccess = async () => {
+      // First check for Stripe session ID (payment-based access)
+      const sessionId = searchParams.get('session_id');
+      
+      if (sessionId) {
+        try {
+          const response = await fetch(`/api/verify-session?session_id=${sessionId}`);
+          const data = await response.json();
+          
+          if (data.valid) {
+            setSessionValid(true);
+            setIsAuthenticated(true);
+            setUserEmail(data.customerEmail || 'Valued Customer');
+            setIsLoading(false);
+            return;
+          }
+        } catch (error) {
+          console.error('Error verifying session:', error);
+        }
+      }
+      
+      // Fallback to email-based authentication for existing users
+      const email = localStorage.getItem('userEmail');
+      const adminStatus = localStorage.getItem('isAdmin') === 'true';
+      
+      if (email) {
+        setUserEmail(email);
+        setIsAdmin(adminStatus);
+        setIsAuthenticated(true);
+      }
+      
+      setIsLoading(false);
+    };
     
-    if (email) {
-      setUserEmail(email);
-      setIsAdmin(adminStatus);
-      setIsAuthenticated(true);
-    }
-    
-    setIsLoading(false);
-  }, []);
+    verifyAccess();
+  }, [searchParams]);
 
   if (isLoading) {
     return (
@@ -55,7 +82,7 @@ export default function Download() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
               >
-                Access Required
+                Payment Required
               </motion.h1>
               <motion.p 
                 className="text-lg text-gray-600 mb-8"
@@ -63,7 +90,7 @@ export default function Download() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.3 }}
               >
-                Please log in with your purchase email to access your AI prompts.
+                Purchase the AI Prompts pack to get instant access to your downloads. No account registration required!
               </motion.p>
               <motion.div 
                 className="space-y-4"
@@ -72,15 +99,15 @@ export default function Download() {
                 transition={{ duration: 0.6, delay: 0.4 }}
               >
                 <Link 
-                  href="/login"
+                  href="/buy"
                   className="inline-block bg-blue-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-blue-700 transition-colors"
                 >
-                  Login to Access
+                  Purchase AI Prompts - $10
                 </Link>
                 <div className="text-sm text-gray-500">
-                  Don&apos;t have the prompts yet?{' '}
-                  <Link href="/buy" className="text-blue-600 hover:text-blue-800 underline">
-                    Purchase here
+                  Already purchased?{' '}
+                  <Link href="/login" className="text-blue-600 hover:text-blue-800 underline">
+                    Login with your email
                   </Link>
                 </div>
               </motion.div>
@@ -129,7 +156,7 @@ export default function Download() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.4 }}
               >
-                {isAdmin ? 'Admin Access' : 'Welcome Back!'}
+                {isAdmin ? 'Admin Access' : sessionValid ? 'Payment Successful!' : 'Welcome Back!'}
               </motion.h1>
               <motion.p 
                 className="text-lg text-black font-bold"
@@ -139,6 +166,8 @@ export default function Download() {
               >
                 {isAdmin 
                   ? 'You have admin access to all AI prompts.' 
+                  : sessionValid 
+                  ? 'Thank you for your purchase! Your AI prompts are ready to download.' 
                   : `Welcome back, ${userEmail}! Your AI prompts are ready to download.`
                 }
               </motion.p>
@@ -320,6 +349,21 @@ export default function Download() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function Download() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    }>
+      <DownloadContent />
+    </Suspense>
   );
 }
 
