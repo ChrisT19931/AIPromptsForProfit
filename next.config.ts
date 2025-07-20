@@ -60,7 +60,7 @@ const nextConfig: NextConfig = {
 
   // Experimental features for security
   experimental: {
-    optimizePackageImports: ['bcryptjs', 'jsonwebtoken']
+    optimizePackageImports: ['jsonwebtoken']
   },
   
 
